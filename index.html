@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ATV — Daily Realisasi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F4EFE6;color:#15120F;min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+:root{
+  --blk:#15120F;--org:#D07048;--crm:#F4EFE6;--gld:#C9A876;--blk2:#2a2520;
+  --ol:#f5e6dd;--om:#e8b89a;--grn:#2D6A4F;--gl2:#d8ede3;--gm2:#8ec4a8;
+  --dsb:#1a4a7a;--dsl:#dce8f5;--dsm:#8fb8e0;--R:12px;--SH:0 2px 8px rgba(21,18,15,.10);
+}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem 1rem;background:var(--blk);position:relative;overflow-y:auto}
+.logo-mark{width:44px;height:44px;border-radius:12px;background:var(--org);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.logo-txt{color:var(--crm);font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.55}
+.s-title{color:var(--crm);font-size:22px;font-weight:800;text-align:center;margin-bottom:4px}
+.s-sub{color:var(--gld);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.65;margin-bottom:20px}
+.back-btn{position:absolute;top:16px;left:16px;background:none;border:none;color:var(--crm);opacity:.45;font-size:22px;cursor:pointer;padding:8px}
+/* SETUP */
+.setup-box{background:var(--blk2);border:1px solid rgba(201,168,118,.18);border-radius:16px;padding:1.4rem;width:100%;max-width:340px;margin-top:8px}
+.step{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px}
+.step-num{min-width:22px;height:22px;border-radius:50%;background:var(--org);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step-txt{color:rgba(244,239,230,.6);font-size:12px;line-height:1.55}
+.step-url{display:block;margin-top:3px;font-size:10px;font-family:monospace;color:var(--gld);background:rgba(255,255,255,.07);padding:3px 8px;border-radius:4px}
+.setup-sep{height:1px;background:rgba(201,168,118,.12);margin:12px 0}
+.fi-dark{width:100%;padding:11px 13px;border-radius:9px;border:1px solid rgba(201,168,118,.2);background:#0f0d0b;color:var(--crm);font-size:13px;outline:none;font-family:monospace;margin-bottom:8px}
+.fi-dark:focus{border-color:var(--org)}
+.fi-dark::placeholder{color:#444;font-family:inherit}
+.btn-org{width:100%;padding:12px;border-radius:9px;border:none;background:var(--org);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.setup-err{color:#e07070;font-size:11px;text-align:center;min-height:14px;margin-top:4px}
+/* ROLE / PIC */
+.role-cards{display:flex;gap:10px;width:100%;max-width:320px}
+.role-card{flex:1;background:var(--blk2);border:1.5px solid rgba(201,168,118,.15);border-radius:16px;padding:1.4rem .8rem;cursor:pointer;text-align:center;transition:all .15s}
+.role-card:active{transform:scale(.97)}.role-card:hover{border-color:var(--org)}.role-card.gold:hover{border-color:var(--gld)}
+.role-card h2{color:var(--crm);font-size:13px;font-weight:700;margin-top:8px}
+.rc-icon{font-size:24px}
+.pic-cards{display:flex;flex-direction:column;gap:8px;width:100%;max-width:310px;margin-top:8px}
+.pic-card{background:var(--blk2);border:1.5px solid rgba(201,168,118,.15);border-radius:13px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .15s}
+.pic-card:active{transform:scale(.98)}.pic-card:hover{border-color:var(--org)}
+.pc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pc-name{color:var(--crm);font-size:14px;font-weight:700}
+.pc-desc{color:rgba(244,239,230,.3);font-size:10px;margin-top:1px}
+.pwd-box{background:var(--blk2);border:1.5px solid rgba(201,168,118,.18);border-radius:14px;padding:1.4rem;width:100%;max-width:290px;display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.pwd-input{width:100%;padding:12px 14px;border-radius:9px;border:1px solid rgba(201,168,118,.2);background:#15120F;color:var(--crm);font-size:16px;outline:none;letter-spacing:3px;text-align:center}
+.pwd-input:focus{border-color:var(--org)}
+.pwd-input::placeholder{letter-spacing:0;color:#555;font-size:13px}
+.pwd-btn{width:100%;padding:13px;border-radius:9px;border:none;background:var(--org);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.pwd-err{color:#e07070;font-size:12px;text-align:center;min-height:14px}
+/* APP */
+.hdr{background:var(--blk);padding:.7rem .8rem;display:flex;align-items:center;gap:7px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(201,168,118,.12)}
+.hdr-back{background:none;border:none;color:var(--crm);font-size:20px;cursor:pointer;padding:4px 6px;opacity:.6}
+.hdr-title{font-size:13px;font-weight:700;flex:1;color:var(--crm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:9px;padding:3px 8px;border-radius:20px;font-weight:700;white-space:nowrap}
+.b-admin{background:rgba(201,168,118,.18);color:var(--gld);border:1px solid rgba(201,168,118,.28)}
+.b-pa{background:var(--gl2);color:var(--grn);border:1px solid var(--gm2)}
+.b-cr{background:var(--ol);color:var(--org);border:1px solid var(--om)}
+.b-pr{background:#ede8f0;color:#4a2d6b;border:1px solid #c5b8d4}
+.b-ds{background:var(--dsl);color:var(--dsb);border:1px solid var(--dsm)}
+.b-all{background:rgba(201,168,118,.18);color:var(--gld);border:1px solid rgba(201,168,118,.28)}
+.hdr-btn{width:32px;height:32px;border-radius:8px;border:1px solid rgba(201,168,118,.15);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--crm);flex-shrink:0}
+/* SYNC BAR */
+.sync-bar{background:var(--blk);padding:.3rem .8rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,118,.07)}
+.sync-info{font-size:9px;color:rgba(244,239,230,.3);display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0}
+.dot.s{background:var(--org);animation:pulse 1s infinite}.dot.e{background:#e07070}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.sync-btn{font-size:9px;padding:2px 9px;border-radius:20px;border:1px solid rgba(201,168,118,.15);background:transparent;color:rgba(244,239,230,.35);cursor:pointer}
+/* MONTH BANNER */
+.month-banner{background:var(--blk);padding:.5rem .8rem .55rem;border-bottom:1px solid rgba(201,168,118,.07)}
+.month-big{font-size:20px;font-weight:800;color:var(--crm);letter-spacing:-.3px;line-height:1}
+.month-sub{font-size:10px;color:rgba(201,168,118,.45);margin-top:2px}
+/* NAV */
+.nav{background:var(--blk);border-bottom:1px solid rgba(201,168,118,.08);padding:.4rem .7rem;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.tabs{display:inline-flex;gap:5px}
+.tab{padding:5px 12px;font-size:11px;border-radius:20px;border:1px solid rgba(201,168,118,.15);background:transparent;cursor:pointer;color:rgba(244,239,230,.4);font-weight:600;white-space:nowrap;transition:all .12s}
+.tab.aw{background:var(--gld);border-color:var(--gld);color:var(--blk)}
+/* STATS */
+.stats{background:var(--blk);padding:.7rem .8rem .3rem}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:7px}
+.stat-card{background:var(--blk2);border:1px solid rgba(201,168,118,.1);border-radius:var(--R);padding:9px 10px}
+.stat-n{font-size:18px;font-weight:800;color:var(--org)}.stat-n.g{color:var(--gld)}
+.stat-l{font-size:9px;color:rgba(244,239,230,.4);margin-top:1px}
+.prog-wrap{background:var(--blk2);border:1px solid rgba(201,168,118,.1);border-radius:var(--R);padding:9px 11px;margin-bottom:7px}
+.prog-lbl{display:flex;justify-content:space-between;font-size:9px;color:rgba(244,239,230,.35);margin-bottom:5px}
+.prog{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--org);border-radius:3px;transition:width .4s}
+/* FILTER */
+.filter{display:flex;gap:5px;padding:.4rem .7rem;overflow-x:auto;scrollbar-width:none;background:var(--crm);border-bottom:1px solid rgba(21,18,15,.07)}
+.filter::-webkit-scrollbar{display:none}
+.fb{padding:5px 11px;font-size:11px;border-radius:20px;border:1px solid rgba(21,18,15,.12);background:transparent;cursor:pointer;color:rgba(21,18,15,.4);white-space:nowrap;font-weight:600}
+.fb.fa{background:var(--blk);border-color:var(--blk);color:var(--crm)}
+.fb.fpa{background:var(--gl2);border-color:var(--gm2);color:var(--grn)}
+.fb.fcr{background:var(--ol);border-color:var(--om);color:var(--org)}
+.fb.fpr{background:#ede8f0;border-color:#c5b8d4;color:#4a2d6b}
+.fb.fds{background:var(--dsl);border-color:var(--dsm);color:var(--dsb)}
+/* CONTENT */
+.content{padding:.6rem .8rem 5rem;background:var(--crm)}
+.day-block{margin-bottom:12px}
+.day-lbl{font-size:10px;font-weight:700;color:rgba(21,18,15,.35);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tag-today{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fff3e0;color:var(--org);border:1px solid var(--om)}
+.tag-ro{font-size:9px;padding:2px 7px;border-radius:20px;background:#f0f0f0;color:#999;border:1px solid #ddd}
+.tag-libur{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#fcebeb;color:#a32d2d;border:1px solid #f7c1c1}
+.task-list{border-radius:var(--R);border:1px solid rgba(21,18,15,.08);overflow:hidden;background:#fff;box-shadow:var(--SH)}
+.task-row{display:flex;flex-direction:column;padding:9px 10px;border-bottom:1px solid rgba(21,18,15,.04)}
+.task-row:last-child{border:none}
+.task-top{display:flex;align-items:flex-start;gap:8px}
+.chkbox{width:20px;height:20px;border-radius:5px;border:1.5px solid rgba(21,18,15,.15);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;cursor:pointer;transition:all .13s}
+.chkbox.on{background:var(--org);border-color:var(--org)}
+.chkbox.on::after{content:'✓';color:#fff;font-size:12px;font-weight:800}
+.task-body{flex:1;min-width:0}
+.task-time{font-size:10px;color:rgba(21,18,15,.32);font-family:monospace;margin-bottom:2px;font-weight:600}
+.task-plan{font-size:13px;color:var(--blk);line-height:1.45;word-break:break-word}
+.task-right{display:flex;align-items:flex-start;gap:3px;flex-shrink:0}
+.pb{font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap}
+.pb-pa{background:var(--gl2);color:var(--grn);border:1px solid var(--gm2)}
+.pb-cr{background:var(--ol);color:var(--org);border:1px solid var(--om)}
+.pb-pr{background:#ede8f0;color:#4a2d6b;border:1px solid #c5b8d4}
+.pb-ds{background:var(--dsl);color:var(--dsb);border:1px solid var(--dsm)}
+.act-btn{width:26px;height:26px;border-radius:6px;border:1px solid rgba(21,18,15,.08);background:#f8f7f4;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.act-del{color:#c0392b}
+.real-wrap{margin-top:5px;padding-left:28px}
+.real-label{font-size:9px;color:rgba(21,18,15,.27);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.real-input{width:100%;padding:5px 9px;border-radius:7px;border:1px solid rgba(21,18,15,.1);font-size:11px;color:rgba(21,18,15,.65);background:#fafaf8;outline:none;font-family:inherit;resize:none;min-height:28px}
+.real-input:focus{border-color:var(--org);background:#fff}
+.task-row.unchecked .task-plan{color:rgba(21,18,15,.5)}
+.empty{padding:14px;text-align:center}
+.empty p{font-size:12px;color:rgba(21,18,15,.25);font-style:italic;margin-bottom:7px}
+.add-inline{padding:5px 14px;border-radius:20px;border:1px dashed rgba(21,18,15,.15);background:transparent;cursor:pointer;font-size:11px;color:rgba(21,18,15,.3);font-weight:500}
+.add-inline:active{border-color:var(--org);color:var(--org)}
+.add-more-row{padding:6px 10px;border-top:1px dashed rgba(21,18,15,.05)}
+.fab{position:fixed;bottom:22px;right:16px;width:50px;height:50px;border-radius:50%;background:var(--org);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(208,112,72,.4);display:none;align-items:center;justify-content:center;z-index:40}
+/* MODAL */
+.mbg{position:fixed;inset:0;background:rgba(21,18,15,.55);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:1.1rem .9rem 2rem;width:100%;max-width:520px;max-height:94vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--blk)}
+.fg{margin-bottom:9px}
+.fl{font-size:9px;color:rgba(21,18,15,.4);margin-bottom:3px;display:block;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.fi,.fs,.fta{width:100%;padding:10px 11px;border-radius:9px;border:1px solid rgba(21,18,15,.12);font-size:13px;color:var(--blk);background:#f8f7f4;outline:none;font-family:inherit}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--org);background:#fff}
+.fta{resize:vertical;min-height:58px}
+.m-acts{display:flex;gap:6px;margin-top:12px}
+.btn-c{flex:1;padding:11px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;font-size:13px;cursor:pointer;color:rgba(21,18,15,.5);font-weight:600}
+.btn-s{flex:2;padding:11px;border-radius:9px;border:none;background:var(--org);font-size:13px;cursor:pointer;color:#fff;font-weight:700}
+.btn-row{display:flex;flex-direction:column;gap:7px}
+.btn-full{width:100%;padding:11px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f8f7f4;font-size:13px;cursor:pointer;color:var(--blk);font-weight:600;text-align:left;display:flex;align-items:center;gap:8px}
+.btn-full.btn-danger{color:#c0392b;border-color:#f7c1c1;background:#fff5f5}
+.hint{font-size:10px;color:rgba(21,18,15,.32);margin-top:1px;font-weight:400}
+.imp-zone{border:2px dashed rgba(21,18,15,.14);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;margin-top:6px}
+.imp-zone p{font-size:12px;color:rgba(21,18,15,.32);margin-bottom:4px}
+.live-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;border-radius:20px;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;margin-left:4px}
+.live-pulse{width:5px;height:5px;border-radius:50%;background:#4caf50;animation:pulse 1.5s infinite}
+@media(min-width:600px){.mbg{align-items:center}.modal{border-radius:14px;margin:1rem;max-height:88vh}}
+</style>
+</head>
+<body>
+
+<!-- ── SETUP FIREBASE ── -->
+<div id="sSetup" class="screen">
+  <div class="logo-row"><div class="logo-mark">ATV</div><div class="logo-txt">Creative Asia</div></div>
+  <div class="s-title">Setup Database</div>
+  <div class="s-sub">Koneksi ke Firebase — sekali saja</div>
+  <div class="setup-box">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-txt">Buka <strong style="color:var(--gld)">console.firebase.google.com</strong> → Buat project baru (gratis)</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-txt">Di menu kiri → <strong style="color:var(--gld)">Realtime Database</strong> → Create Database → pilih region → <em>Start in test mode</em></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-txt">Di tab <strong style="color:var(--gld)">Rules</strong>, paste ini lalu Publish:
+        <span class="step-url">{"rules":{".read":true,".write":true}}</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-txt">Copy <strong style="color:var(--gld)">Database URL</strong> (contoh):
+        <span class="step-url">https://nama-project-rtdb.firebaseio.com</span>
+      </div>
+    </div>
+    <div class="setup-sep"></div>
+    <label style="font-size:10px;color:rgba(244,239,230,.45);font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Database URL</label>
+    <input class="fi-dark" id="fbUrlIn" placeholder="https://xxx-default-rtdb.firebaseio.com" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button class="btn-org" onclick="saveConfig()" id="btnConnect">🔗 Hubungkan & Mulai</button>
+    <div class="setup-err" id="setupErr"></div>
+  </div>
+</div>
+
+<!-- ── ROLE ── -->
+<div id="sRole" class="screen">
+  <div class="logo-row"><div class="logo-mark">ATV</div><div class="logo-txt">Creative Asia</div></div>
+  <div class="s-title">Daily Realisasi</div>
+  <div class="s-sub">Timeframe Internal · 2026</div>
+  <div class="role-cards">
+    <div class="role-card" onclick="showPic()"><div class="rc-icon">👥</div><h2>Tim</h2></div>
+    <div class="role-card gold" onclick="showPwd()"><div class="rc-icon">🛡️</div><h2>Admin</h2></div>
+  </div>
+</div>
+
+<!-- ── PIC ── -->
+<div id="sPic" class="screen">
+  <button class="back-btn" onclick="sw('sRole')">←</button>
+  <div class="logo-row"><div class="logo-mark">ATV</div></div>
+  <div class="s-title">Pilih PIC Kamu</div>
+  <div class="s-sub">Login sebagai anggota tim</div>
+  <div class="pic-cards">
+    <div class="pic-card" onclick="enter('tim','PAK AGUNG')"><div class="pc-dot" style="background:var(--grn)"></div><div><div class="pc-name">PAK AGUNG</div><div class="pc-desc">Business & Client Relations</div></div></div>
+    <div class="pic-card" onclick="enter('tim','CREATIVE')"><div class="pc-dot" style="background:var(--org)"></div><div><div class="pc-name">CREATIVE</div><div class="pc-desc">Konten, Brief & Strategi</div></div></div>
+    <div class="pic-card" onclick="enter('tim','PRODUKSI')"><div class="pc-dot" style="background:#4a2d6b"></div><div><div class="pc-name">PRODUKSI</div><div class="pc-desc">Editing & QC Video</div></div></div>
+    <div class="pic-card" onclick="enter('tim','DESIGNER')"><div class="pc-dot" style="background:var(--dsb)"></div><div><div class="pc-name">DESIGNER</div><div class="pc-desc">Visual & Desain Grafis</div></div></div>
+  </div>
+</div>
+
+<!-- ── PWD ── -->
+<div id="sPwd" class="screen">
+  <button class="back-btn" onclick="sw('sRole')">←</button>
+  <div class="logo-row"><div class="logo-mark">ATV</div></div>
+  <div class="s-title">Akses Admin</div>
+  <div class="s-sub">ATV Creative Asia</div>
+  <div class="pwd-box">
+    <input class="pwd-input" type="password" id="pwdIn" placeholder="Password admin" onkeydown="if(event.key==='Enter')loginAdmin()">
+    <button class="pwd-btn" onclick="loginAdmin()">Masuk →</button>
+    <div class="pwd-err" id="pwdErr"></div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app" style="display:none">
+  <div class="hdr">
+    <button class="hdr-back" onclick="logout()">←</button>
+    <div class="hdr-title">ATV · Daily Realisasi <span class="live-badge"><span class="live-pulse"></span>LIVE</span></div>
+    <span id="badge" class="badge"></span>
+    <button class="hdr-btn" onclick="openExport()" title="Export/Import">⬇️</button>
+    <button class="hdr-btn" id="btnCfg" onclick="openCfg()" style="display:none">⚙️</button>
+  </div>
+  <div class="sync-bar">
+    <div class="sync-info"><span class="dot" id="syncDot"></span><span id="syncTxt">Menghubungkan...</span></div>
+    <button class="sync-btn" onclick="doSync()">↻ Sync</button>
+  </div>
+  <div class="month-banner">
+    <div class="month-big" id="monthBig">—</div>
+    <div class="month-sub" id="monthSub">Memuat...</div>
+  </div>
+  <div class="nav" id="navWrap"></div>
+  <div id="statsWrap" style="display:none">
+    <div class="stats">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="prog-wrap"><div class="prog-lbl"><span>Progress Minggu Ini</span><span id="progPct">0%</span></div><div class="prog"><div class="prog-fill" id="progFill" style="width:0"></div></div></div>
+    </div>
+  </div>
+  <div class="filter" id="filterBar"></div>
+  <div class="content" id="content"></div>
+  <button class="fab" id="fab" onclick="openAdd(null)">＋</button>
+</div>
+
+<!-- ── TASK MODAL ── -->
+<div class="mbg" id="mTask" onclick="bgClose(event,'mTask')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="mTitle">Tambah Plan</div>
+    <div class="fg"><label class="fl">Tanggal</label><input class="fi" type="date" id="fDate"></div>
+    <div class="fg">
+      <label class="fl">Jam <span style="font-weight:400;text-transform:none;letter-spacing:0;color:rgba(21,18,15,.3)">(cth: 0830-0930 atau 09.00-10.00)</span></label>
+      <input class="fi" id="fWaktu" placeholder="08.30 - 09.30" onblur="autoFmt(this)">
+    </div>
+    <div class="fg"><label class="fl">Plan / Kegiatan</label><textarea class="fta" id="fPlan" placeholder="Deskripsi kegiatan..."></textarea></div>
+    <div class="fg" id="fPicWrap"><label class="fl">PIC</label>
+      <select class="fs" id="fPic"><option>PAK AGUNG</option><option>CREATIVE</option><option>PRODUKSI</option><option>DESIGNER</option></select>
+    </div>
+    <div class="m-acts">
+      <button class="btn-c" onclick="closeM('mTask')">Batal</button>
+      <button class="btn-s" onclick="saveTask()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EXPORT/IMPORT ── -->
+<div class="mbg" id="mExport" onclick="bgClose(event,'mExport')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">📤 Export & Import</div>
+    <div class="btn-row">
+      <button class="btn-full" onclick="exportCSV()">📄 <div><div>Download CSV</div><div class="hint">Google Sheets, Notepad</div></div></button>
+      <button class="btn-full" onclick="exportExcel()">📊 <div><div>Download Excel (.xlsx)</div><div class="hint">Microsoft Excel</div></div></button>
+      <button class="btn-full" onclick="exportPDF()">🖨️ <div><div>Download PDF</div><div class="hint">Print / arsip formal</div></div></button>
+      <button class="btn-full" onclick="exportJSON()">💾 <div><div>Download JSON (Backup)</div><div class="hint">Backup penuh semua data</div></div></button>
+    </div>
+    <div style="margin:12px 0 6px;font-size:10px;font-weight:700;color:rgba(21,18,15,.38);text-transform:uppercase;letter-spacing:.5px">Import Data</div>
+    <div class="imp-zone" onclick="document.getElementById('impFile').click()">
+      <p>Klik untuk pilih file</p>
+      <p style="font-size:11px;color:rgba(21,18,15,.25)">CSV, Excel (.xlsx), JSON</p>
+      <input type="file" id="impFile" accept=".csv,.xlsx,.xls,.json" style="display:none" onchange="handleImport(this)">
+    </div>
+    <div id="impStatus" style="font-size:11px;color:var(--grn);margin-top:6px;min-height:14px"></div>
+    <div class="m-acts" style="margin-top:10px"><button class="btn-s" onclick="closeM('mExport')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- ── CFG MODAL ── -->
+<div class="mbg" id="mCfg" onclick="bgClose(event,'mCfg')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">⚙️ Admin Panel</div>
+    <div class="btn-row">
+      <button class="btn-full" onclick="openPwdChange()">🔑 <div>Ubah Password</div></button>
+      <button class="btn-full" onclick="resetFbConfig()">🔗 <div><div>Ganti Firebase URL</div><div class="hint" id="currentFbUrl" style="word-break:break-all;color:rgba(21,18,15,.3)">Memuat...</div></div></button>
+      <button class="btn-full" onclick="closeM('mCfg');openProduktivitas()">📊 <div><div>Data Produktivitas</div><div class="hint">Diagram beban kerja tim</div></div></button>
+      <button class="btn-full" onclick="closeM('mCfg');openSheetsPwd()" style="border-color:#1a7a3c;color:#1a7a3c">📗 <div><div>Google Sheets</div><div class="hint">Sambungkan spreadsheet database</div></div></button>
+      <button class="btn-full btn-danger" onclick="nukeWeek()">🗑 <div>Hapus Data Minggu Ini</div></button>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:#f8f7f4;border-radius:9px;font-size:11px;line-height:1.7;color:rgba(21,18,15,.5)">
+      <strong>🔧 Cara update kode via Claude:</strong><br>
+      1. Download file HTML ini (Ctrl+S di browser)<br>
+      2. Upload ke Claude → minta revisi fitur<br>
+      3. Copy kode baru → simpan sebagai .html<br>
+      4. Upload ke GitHub repo → GitHub Pages auto-update<br>
+      <span style="color:var(--grn);font-weight:600">GitHub repo: atv-daily-realisasi</span>
+    </div>
+    <div class="m-acts" style="margin-top:10px"><button class="btn-s" onclick="closeM('mCfg')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- ── PRODUKTIVITAS MODAL ── -->
+<div class="mbg" id="mProd" onclick="bgClose(event,'mProd')">
+  <div class="modal" onclick="event.stopPropagation()" style="border-radius:20px 20px 0 0;padding-bottom:2.5rem">
+    <div class="modal-title">📊 Data Produktivitas Tim</div>
+
+    <!-- Skala toggle -->
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button id="btnSkalaP" onclick="setSkala('planning')" style="flex:1;padding:9px;border-radius:9px;border:2px solid var(--org);background:var(--org);color:#fff;font-size:12px;font-weight:700;cursor:pointer">📋 Skala: Planning</button>
+      <button id="btnSkalaR" onclick="setSkala('realisasi')" style="flex:1;padding:9px;border-radius:9px;border:2px solid rgba(21,18,15,.12);background:#f4f3ef;color:rgba(21,18,15,.5);font-size:12px;font-weight:700;cursor:pointer">✅ Skala: Realisasi</button>
+    </div>
+
+    <!-- Date range -->
+    <div style="background:#f8f7f4;border-radius:10px;padding:10px;margin-bottom:12px">
+      <div style="font-size:9px;font-weight:700;color:rgba(21,18,15,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">📅 Rentang Data</div>
+      <div style="display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:110px">
+          <label style="font-size:9px;color:rgba(21,18,15,.4);display:block;margin-bottom:3px">DARI</label>
+          <input type="date" id="prodStartDate" class="fi" style="padding:7px 9px;font-size:12px">
+        </div>
+        <div style="flex:1;min-width:110px">
+          <label style="font-size:9px;color:rgba(21,18,15,.4);display:block;margin-bottom:3px">SAMPAI</label>
+          <input type="date" id="prodEndDate" class="fi" style="padding:7px 9px;font-size:12px">
+        </div>
+        <button onclick="applyDateRange()" style="padding:8px 14px;border-radius:9px;border:none;background:var(--blk);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Terapkan</button>
+      </div>
+    </div>
+
+    <!-- Chart type -->
+    <div style="display:flex;gap:5px;margin-bottom:12px">
+      <button id="ct-pie" onclick="setChartType('pie')" style="flex:1;padding:8px 4px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;color:rgba(21,18,15,.5);font-size:11px;font-weight:600;cursor:pointer">🥧 Lingkaran</button>
+      <button id="ct-curve" onclick="setChartType('curve')" style="flex:1;padding:8px 4px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;color:rgba(21,18,15,.5);font-size:11px;font-weight:600;cursor:pointer">📈 Kurva</button>
+      <button id="ct-bar" onclick="setChartType('bar')" style="flex:1;padding:8px 4px;border-radius:9px;border:1px solid var(--blk);background:var(--blk);color:#fff;font-size:11px;font-weight:600;cursor:pointer">📊 Batang</button>
+    </div>
+
+    <!-- Canvas -->
+    <div id="prodChartWrap" style="position:relative;height:260px">
+      <canvas id="prodCanvas"></canvas>
+    </div>
+
+    <!-- Summary -->
+    <div id="prodSummary" style="margin-top:12px;padding:10px;background:#f8f7f4;border-radius:9px;line-height:1.6"></div>
+
+    <div class="m-acts" style="margin-top:12px">
+      <button class="btn-s" onclick="closeM('mProd')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PWD CHANGE ── -->
+<div class="mbg" id="mPwd" onclick="bgClose(event,'mPwd')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">🔑 Ubah Password</div>
+    <div style="font-size:10px;font-weight:700;color:rgba(21,18,15,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Password Admin</div>
+    <div class="fg"><label class="fl">Password Baru</label><input class="fi" type="password" id="np1" autocomplete="new-password"></div>
+    <div class="fg"><label class="fl">Konfirmasi</label><input class="fi" type="password" id="np2" autocomplete="new-password"></div>
+    <div class="pwd-err" id="npErr"></div>
+    <button class="btn-s" onclick="savePwd()" style="width:100%;margin-bottom:14px">Simpan Password Admin</button>
+    <div style="height:1px;background:rgba(21,18,15,.08);margin-bottom:14px"></div>
+    <div style="font-size:10px;font-weight:700;color:#1a7a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Password Google Sheets</div>
+    <div class="fg"><label class="fl">Password Baru</label><input class="fi" type="password" id="sp1" autocomplete="new-password"></div>
+    <div class="fg"><label class="fl">Konfirmasi</label><input class="fi" type="password" id="sp2" autocomplete="new-password"></div>
+    <div class="pwd-err" id="spErr2"></div>
+    <button class="btn-s" onclick="saveSheetsPwd()" style="width:100%;background:#1a7a3c;margin-bottom:8px">Simpan Password Sheets</button>
+    <div class="m-acts" style="margin-top:4px"><button class="btn-c" onclick="closeM('mPwd')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- ── SHEETS PASSWORD ── -->
+<div class="mbg" id="mSheetsPwd" onclick="bgClose(event,'mSheetsPwd')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">📗 Google Sheets</div>
+    <p style="font-size:12px;color:rgba(21,18,15,.4);margin-bottom:14px">Masukkan password untuk akses konfigurasi Sheets</p>
+    <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="spwdIn" placeholder="Password Sheets" onkeydown="if(event.key==='Enter')loginSheets()"></div>
+    <div class="pwd-err" id="spwdErr"></div>
+    <div class="m-acts">
+      <button class="btn-c" onclick="closeM('mSheetsPwd')">Batal</button>
+      <button class="btn-s" onclick="loginSheets()" style="background:#1a7a3c">Masuk →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SHEETS SETUP ── -->
+<div class="mbg" id="mSheetsSetup" onclick="bgClose(event,'mSheetsSetup')">
+  <div class="modal" onclick="event.stopPropagation()" style="border-radius:20px 20px 0 0;padding-bottom:2.5rem">
+    <div class="modal-title">📗 Google Sheets Setup</div>
+
+    <!-- Koneksi -->
+    <div style="font-size:10px;font-weight:700;color:#1a7a3c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔗 Koneksi Web App</div>
+    <div class="fg"><label class="fl">Web App URL (dari Apps Script)</label><input class="fi" id="sheetsWaUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false"></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button onclick="saveSheetsConfig()" style="flex:1;padding:9px;border-radius:9px;border:none;background:#1a7a3c;color:#fff;font-size:12px;font-weight:700;cursor:pointer">💾 Simpan URL</button>
+      <button onclick="testSheetsConn()" style="flex:1;padding:9px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;font-size:12px;font-weight:600;cursor:pointer">🔍 Test Koneksi</button>
+    </div>
+    <div id="sheetsStatus" style="font-size:11px;min-height:16px;margin-bottom:12px;color:rgba(21,18,15,.4)"></div>
+
+    <!-- Panduan -->
+    <div style="height:1px;background:rgba(21,18,15,.08);margin-bottom:12px"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(21,18,15,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📋 Panduan Setup (sekali saja)</div>
+    <div style="font-size:11px;color:rgba(21,18,15,.55);line-height:1.8;margin-bottom:8px">
+      <b>1.</b> Buka Google Sheet yang akan jadi database<br>
+      <b>2.</b> Klik <b>Extensions → Apps Script</b><br>
+      <b>3.</b> Hapus semua kode → paste kode di bawah ini:<br>
+    </div>
+    <textarea id="appsScriptCode" readonly rows="5" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(21,18,15,.1);font-size:10px;font-family:monospace;background:#f8f7f4;resize:none;color:rgba(21,18,15,.65)"></textarea>
+    <button onclick="copyAppsScript()" style="width:100%;padding:8px;margin:6px 0 10px;border-radius:8px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;font-size:12px;font-weight:600;cursor:pointer">📋 Copy Kode Apps Script</button>
+    <div style="font-size:11px;color:rgba(21,18,15,.55);line-height:1.8;margin-bottom:12px">
+      <b>4.</b> Klik <b>Deploy → New Deployment → Web App</b><br>
+      <b>5.</b> Execute as: <b>Me</b> | Who has access: <b>Anyone</b><br>
+      <b>6.</b> Klik Deploy → copy URL → paste di kolom atas<br>
+      <b>7.</b> Klik <b>Simpan URL</b> → <b>Test Koneksi</b> ✅
+    </div>
+
+    <!-- Sinkronisasi -->
+    <div style="height:1px;background:rgba(21,18,15,.08);margin-bottom:12px"></div>
+    <div style="font-size:10px;font-weight:700;color:rgba(21,18,15,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🔄 Sinkronisasi</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f8f7f4;border-radius:9px;margin-bottom:8px">
+      <div>
+        <div style="font-size:12px;font-weight:600">Auto-sync ke Sheets</div>
+        <div style="font-size:10px;color:rgba(21,18,15,.4)" id="sheetsLastSync">Belum pernah sync</div>
+      </div>
+      <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0">
+        <input type="checkbox" id="sheetsAutoToggle" onchange="toggleSheetsAutoSync()" style="opacity:0;width:0;height:0">
+        <span onclick="document.getElementById('sheetsAutoToggle').click()" style="position:absolute;inset:0;background:#ccc;border-radius:24px;cursor:pointer;transition:.3s" id="sheetsToggleSlider"></span>
+      </label>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:4px">
+      <button onclick="syncToSheets()" style="flex:1;padding:9px;border-radius:9px;border:none;background:#1a7a3c;color:#fff;font-size:12px;font-weight:700;cursor:pointer">📤 Sync ke Sheets</button>
+      <button onclick="syncFromSheets()" style="flex:1;padding:9px;border-radius:9px;border:1px solid rgba(21,18,15,.12);background:#f4f3ef;font-size:12px;font-weight:600;cursor:pointer">📥 Ambil dari Sheets</button>
+    </div>
+
+    <div class="m-acts" style="margin-top:14px">
+      <button class="btn-s" onclick="closeM('mSheetsSetup')" style="background:#333">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ CONFIG ══════════════════════════════════════════════
+const PWKEY='atv_pwd_v2';
+const LSKEY='atv_local_v8';
+const FB_NODE='atv_data_v8';
+// ── Firebase URL tertanam langsung — tidak perlu setup ──
+const FB_URL='https://chris-laboratory-7d48b-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+// ══ SEED DATA (Histori — hardcoded, tidak disimpan di Firebase) ══
+const SEED={
+'2026-05-25':[
+  {id:1,w:'09.00 - 10.00',p:'Buat to do list hari ini, prepare',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 12.00',p:'Meeting Team (Menyamakan Persepsi)',pic:'PAK AGUNG',chk:false,real:''},
+  {id:3,w:'09.00 - 11.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:4,w:'10.00 - 10.02',p:'Delegasi Kak Fenny Buat 2 Cover Reels Joce',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.05 - 10.30',p:'Buat keterangan brief & delegasi Request Ibu Maya (Folder dokumentasi Hotel)',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.00 - 12.00',p:'Meeting Team (Menyamakan Persepsi)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'13.00 - 14.00',p:'Meeting Client Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'13.00 - 14.00',p:'Update Timeframe & Timeline',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'14.00 - 15.00',p:'Delegasi Cek Stock Materi Maheswara hardsell Pameran (Danang) sisa 4 video baru',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'14.00 - 16.30',p:'Editing 4 Content Tale Studio',pic:'PRODUKSI',chk:false,real:''},
+  {id:12,w:'14.00 - 16.00',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:13,w:'15.00 - 16.45',p:'Buat Brief Desain Story Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'16.05 - 16.20',p:'Buat brief desain Azkafun 4',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'16.30 - 17.00',p:'Break ashar',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'16.30 - 16.45',p:'QC Content Ads Tale Studio',pic:'PRODUKSI',chk:false,real:''},
+  {id:17,w:'16.45 - 17.00',p:'Revisi Content Tale Studio',pic:'PRODUKSI',chk:false,real:''},
+  {id:18,w:'17.00 - 17.15',p:'QC video Tale Studio',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.00 - 18.00',p:'Editing 3 Content Video Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:20,w:'17.16 - 17.30',p:'QC video Maheswara untuk propose posting hari ini',pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'17.30 - 18.00',p:'Buat script VO Bu Maya promosi Bride Story JCC 12-14 Juni',pic:'CREATIVE',chk:false,real:''},
+  {id:22,w:'18.00 - 18.15',p:'Delegasi revisi insert gambar maheswara & posting Talestudio',pic:'CREATIVE',chk:false,real:''},
+  {id:23,w:'18.15 - 18.20',p:'Propose video maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:24,w:'23.00 - 23.10',p:'Posting carousel di Tiktok & Ig',pic:'CREATIVE',chk:false,real:''},
+],
+'2026-05-26':[
+  {id:1,w:'09.00 - 09.30',p:'Follow up produk baru Azkafun, daily update saku, follow up acc video content Maheswara & Vo',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.10',p:'Update To do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.00 - 11.00',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:4,w:'09.10 - 10.00',p:'Editing 1 Content PB Joce',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'09.30 - 10.00',p:'Research & stok carousel Tale Studio, buat brief desain Tale Studio',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'10.00 - 11.00',p:'Research referensi TikTok Domination, buat brief desain Tiktok Domination 3 (merapikan folder pameran untuk kebutuhan footage video promosi)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'10.00 - 10.15',p:'QC Video PB Joce ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'10.15 - 10.35',p:'Revisi (jika ada)',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'10.35 - 15.00',p:'Editing 5 Content Podcast Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'11.00 - 11.00',p:'Delegasi Edit video maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'13.00 - 13.05',p:'Schedule post Azkafun feed instagram 2 post',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'13.30 - 14.00',p:'Cek stok posting semua client sebelum libur',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'14.00 - 15.00',p:'Tanya client & list hotel ke Ibu Maya & delegasi kak fenny & QC video Joce',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'14.00 - 16.00',p:'Meeting Client Glowsense',pic:'PAK AGUNG',chk:false,real:''},
+  {id:17,w:'15.00 - 16.00',p:'Follow up Vo Ibu Maya (jika belum) & delegasi revisi video',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'15.00 - 15.15',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:19,w:'15.15 - 16.00',p:'Revisi Content (jika ada)',pic:'PRODUKSI',chk:false,real:''},
+  {id:20,w:'16.00 - 17.00',p:'Propose desain & video terbaru (listing desain & video)',pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'16.00 - 17.00',p:'Editing 1 Content Ads Tale Studio',pic:'PRODUKSI',chk:false,real:''},
+  {id:22,w:'17.00 - 18.00',p:'Posting & scheduling konten Tiktok Domination, Talestudio & Maheswara saat libur',pic:'CREATIVE',chk:false,real:''},
+  {id:23,w:'17.00 - 17.15',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:24,w:'17.15 - 18.00',p:'Revisi Content (Jika Ada)',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-05-28':[
+  {id:1,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:2,w:'09.00 - 11.00',p:'Meeting Client Glowsense',pic:'PAK AGUNG',chk:false,real:''},
+  {id:3,w:'09.15 - 12.00',p:'Editing Maheswara 3 video',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'13.00 - 13.15',p:'QC Video ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:6,w:'13.15 - 14.00',p:'Revisi Content (jika ada)',pic:'PRODUKSI',chk:false,real:''},
+  {id:7,w:'16.30 - 18.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+],
+'2026-05-29':[
+  {id:1,w:'09.00 - 09.15',p:'Update client Azkafun & Saku Laundry terkait info shooting',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 10.00',p:'Prepare props shooting Saku Laundry & list kebutuhan shooting',pic:'CREATIVE',chk:false,real:''},
+  {id:4,w:'09.15 - 11.30',p:'Editing 3 Content Podcast Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'10.00 - 16.00',p:'Ke ICE BSD event JOCE',pic:'PAK AGUNG',chk:false,real:''},
+  {id:6,w:'10.00 - 11.00',p:'Shooting konten di kantor',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'11.00 - 11.30',p:'Delegasi editing Maheswara (2 video)',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'11.30 - 12.00',p:'Cek stok posting semua client',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'11.30 - 11.40',p:'QC Content ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'11.40 - 12.00',p:'Revisi content (jika ada)',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'13.00 - 16.00',p:'Berangkat & shooting Saku Laundry',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'13.00 - 13.15',p:'List keperluan shooting saku laundry',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'13.15 - 18.00',p:'Shooting saku laundry',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'16.00 - 16.30',p:'Buat brief Tale Studio (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'16.30 - 17.00',p:'Buat brief TikTok Domination (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'17.00 - 17.30',p:'Delegasi desain ke Kak Kenny & tentukan prioritas minggu depan',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.30 - 18.00',p:'Schedule post semua client',pic:'CREATIVE',chk:false,real:''},
+],
+'2026-06-02':[
+  {id:1,w:'09.00 - 11.00',p:'Susun timeframe kerja minggu ini',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 11.00',p:'Update Time Frame 1 Minggu',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.30 - 10.30',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:4,w:'10.30 - 12.30',p:'Meeting Client Glowsence',pic:'PAK AGUNG',chk:false,real:''},
+  {id:5,w:'11.00 - 12.00',p:'Research topik podcast Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.00 - 12.00',p:'Mencari 10 Reference Konten Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'13.00 - 14.30',p:'Research lanjutan podcast Maheswara (vendor, angle pembahasan, flow podcast)',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'13.00 - 15.00',p:'Recycle 3 Podcast Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'14.00 - 16.00',p:'Meeting Client JOSEI',pic:'PAK AGUNG',chk:false,real:''},
+  {id:12,w:'14.30 - 15.30',p:'Susun draft pertanyaan podcast versi 1',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'15.00 - 15.20',p:'Revisi Konten (jika ada)',pic:'PRODUKSI',chk:false,real:''},
+  {id:14,w:'15.20 - 16.00',p:'Membuat Script Konten Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'15.30 - 16.30',p:'Buat brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'16.00 - 16.15',p:'Prepare Shooting Azkafun',pic:'PRODUKSI',chk:false,real:'reschedule ke minggu depan karena scriptnya masih proses dan waktunya sudah mendekati jam pulang'},
+  {id:17,w:'16.15 - 18.00',p:'Shooting Azkafun',pic:'PRODUKSI',chk:false,real:'reschedule ke minggu depan karena scriptnya masih proses dan waktunya sudah mendekati jam pulang'},
+  {id:18,w:'16.30 - 17.00',p:'Buat brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.00 - 17.30',p:'Buat brief Tale Studio (2 brief)',pic:'CREATIVE',chk:false,real:'Edit story request Maheswara & post tag client'},
+  {id:20,w:'17.30 - 18.00',p:"Buat brief TikTok Domination (2 brief) & delegasi ke designer",pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'19.00 - 21.00',p:'Meeting Client Maheswara',pic:'PAK AGUNG',chk:false,real:''},
+],
+'2026-06-03':[
+  {id:1,w:'09.00 - 10.30',p:'Finalisasi pertanyaan podcast Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.10',p:'Update List Editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.10 - 11.30',p:'Editing 3 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.30 - 11.30',p:'Buat catatan hasil meeting (tabel)',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'11.30 - 12.00',p:'Follow up kebutuhan request Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.30 - 11.40',p:'QC Content Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:7,w:'11.40 - 12.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'13.00 - 14.00',p:'Buat brief Maheswara pertanyaan shooting',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'13.00 - 16.00',p:'Editing 3 Konten Azkafun',pic:'PRODUKSI',chk:false,real:'belum shooting jadi di ganti dengan tambahan 3 output maheswara'},
+  {id:12,w:'14.00 - 14.30',p:'Delegasi revisi & reminder Pak Agung & bu Maya',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'14.30 - 15.00',p:'Delegasi desain ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'15.00 - 15.30',p:'Buat brief Tale Studio (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'15.30 - 16.30',p:'QC video Maheswara & list revisi',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'16.00 - 16.15',p:'QC Content Azkafun',pic:'PRODUKSI',chk:false,real:'belum shooting jadi di ganti dengan tambahan 3 output maheswara'},
+  {id:17,w:'16.15 - 17.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:'belum shooting jadi di ganti dengan tambahan 3 output maheswara'},
+  {id:18,w:'16.30 - 17.00',p:'QC desain',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.00 - 18.00',p:'Posting & schedule posting content & follow up Acc video terbaru',pic:'CREATIVE',chk:false,real:''},
+],
+'2026-06-04':[
+  {id:1,w:'09.00 - 09.30',p:'Final cek pertanyaan podcast',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update List Editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 10.00',p:'Prepare Shooting Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.30 - 10.30',p:'Delegasi brief ke designer (revisi desain)',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.00 - 16.00',p:'Shooting Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:6,w:'10.30 - 11.00',p:'Shooting Podcast Maheswara, delegasi editor',pic:'CREATIVE',chk:false,real:'Buat timeline menuju pameran bridestory'},
+  {id:7,w:'11.00 - 11.30',p:'(lanjutan brief & delegasi)',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'11.30 - 12.00',p:'(lanjutan brief & delegasi)',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'13.00 - 17.00',p:'Buat brief Maheswara (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'17.00 - 17.30',p:'Buat brief TikTok Domination (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'17.30 - 18.00',p:'Upload & schedule post',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'09.00 - 11.00',p:'Meeting Client Glowsence',pic:'PAK AGUNG',chk:false,real:''},
+],
+'2026-06-05':[
+  {id:1,w:'09.00 - 11.00',p:'Meeting Client Glowsence',pic:'PAK AGUNG',chk:false,real:''},
+  {id:2,w:'09.00 - 10.00',p:'Review hasil shooting podcast Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:3,w:'09.00 - 09.15',p:'Update List Editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.15 - 10.00',p:'Editing 1 Konten Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'10.00 - 10.30',p:'Delegasi editing podcast Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'10.00 - 10.15',p:'QC Content Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:7,w:'10.15 - 10.30',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'10.30 - 11.00',p:'Brief potongan konten podcast',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'10.30 - 14.00',p:'Editing 3 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'11.00 - 12.00',p:'Script video Joce',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'13.00 - 14.00',p:'Buat brief Maheswara (3 brief)',pic:'CREATIVE',chk:false,real:'5 brief'},
+  {id:14,w:'13.30 - 15.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:15,w:'14.00 - 14.30',p:'Buat brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'14.00 - 14.15',p:'QC Content Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:17,w:'14.15 - 18.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:18,w:'14.30 - 15.00',p:'Buat brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:'masih ada stok'},
+  {id:19,w:'15.00 - 15.30',p:'Buat brief TikTok Domination (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'15.30 - 16.00',p:'Delegasi desain ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'16.00 - 17.00',p:'Tentukan prioritas konten minggu depan',pic:'CREATIVE',chk:false,real:'Meeting bersama maheswara QC 9 video & list 7 revisi, listing link video & desain terbaru untuk minta acc ibu maya'},
+  {id:22,w:'16.00 - 18.00',p:'Meeting Client Maheswara',pic:'PAK AGUNG',chk:false,real:''},
+  {id:23,w:'17.00 - 18.00',p:'Schedule posting & cek stok seluruh client',pic:'CREATIVE',chk:false,real:'dikerjakan after jam kerja'},
+],
+'2026-06-08':[
+  {id:1,w:'09.00 - 11.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:2,w:'09.00 - 11.00',p:'Susun timeframe kerja minggu ini',pic:'CREATIVE',chk:false,real:''},
+  {id:3,w:'09.00 - 10.30',p:'Update Time Frame 1 Minggu ke depan',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.30 - 12.00',p:'Revisi 4 Content Video Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'11.00 - 11.30',p:'Follow up rundown wedding Balai Sudirman',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.30 - 12.00',p:'Cek stok seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'13.00 - 14.00',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'13.00 - 13.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'13.30 - 14.00',p:'Editing Order Video Pak Agung',pic:'PRODUKSI',chk:false,real:''},
+  {id:12,w:'14.00 - 16.00',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:13,w:'14.00 - 14.30',p:'Brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:'output 4 desain'},
+  {id:14,w:'14.00 - 14.10',p:'Prepare Shooting Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'14.10 - 16.30',p:'Shooting Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'14.30 - 14.45',p:'Brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:'Research bahan brief Maheswara'},
+  {id:17,w:'14.45 - 15.00',p:'Brief TikTok Domination (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'15.00 - 15.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'15.15 - 16.15',p:'Susun 10 pertanyaan konten reguler Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'16.15 - 17.15',p:'Susun 10 pertanyaan Wedding Market Fair',pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'16.30 - 17.00',p:'Editing 3 Content Video Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:22,w:'17.00 - 17.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:23,w:'17.15 - 18.00',p:'Posting seluruh client & QC desain yang sudah masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:24,w:'17.30 - 17.50',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:25,w:'17.50 - 18.00',p:'Update realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-09':[
+  {id:1,w:'09.00 - 11.00',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:2,w:'09.00 - 09.30',p:'Follow up rundown wedding Balai Sudirman',pic:'CREATIVE',chk:false,real:''},
+  {id:3,w:'09.00 - 09.15',p:'Update to do list editing ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.15 - 11.00',p:'Editing 4 Content Video Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'09.30 - 10.30',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:'6 output'},
+  {id:6,w:'10.30 - 11.00',p:'Brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:'Diganti dengan brief Maheswara'},
+  {id:7,w:'11.00 - 11.30',p:'Brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'11.00 - 11.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'11.30 - 12.00',p:'Brief TikTok Domination (1 brief)',pic:'CREATIVE',chk:false,real:'Diganti dengan brief Maheswara'},
+  {id:10,w:'11.30 - 12.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'13.00 - 13.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'13.00 - 15.00',p:'Editing 4 Content Video Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'13.15 - 14.15',p:'Susun 10 pertanyaan konten reguler Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'14.00 - 16.00',p:'Meeting Client Glowsence',pic:'PAK AGUNG',chk:false,real:''},
+  {id:17,w:'14.15 - 15.15',p:'Susun Jorney Pameran Wedding Market',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'15.00 - 15.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:19,w:'15.15 - 16.15',p:'Susun 10 pertanyaan Wedding Market Fair',pic:'CREATIVE',chk:false,real:'QC desain, video & delegasi revisi'},
+  {id:20,w:'15.30 - 17.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:21,w:'16.15 - 17.00',p:'QC desain masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:22,w:'17.00 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:23,w:'17.00 - 17.45',p:'Upload RAW All Client Ke Draft',pic:'PRODUKSI',chk:false,real:''},
+  {id:24,w:'17.45 - 18.00',p:'Update realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-10':[
+  {id:1,w:'09.00 - 09.30',p:'Follow up rundown wedding Balai Sudirman',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 11.00',p:'Editing 3 Content Video Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.30 - 10.30',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.30 - 11.00',p:'Brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.00 - 11.30',p:'Brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'11.00 - 11.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'11.30 - 12.00',p:'Brief TikTok Domination (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'11.30 - 12.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:12,w:'13.00 - 13.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'13.00 - 15.00',p:'Editing 4 Content Video Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:14,w:'13.15 - 14.15',p:'Susun 10 pertanyaan konten reguler Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'14.15 - 15.15',p:'Finalisasi pertanyaan vendor & Bu Maya',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'15.00 - 15.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:false,real:''},
+  {id:17,w:'15.15 - 16.15',p:'Susun 10 pertanyaan Wedding Market Fair',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'15.30 - 17.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:19,w:'16.15 - 17.00',p:'QC desain masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'17.00 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:21,w:'17.00 - 18.00',p:'Update realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-11':[
+  {id:1,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:true,real:''},
+  {id:2,w:'09.15 - 11.30',p:'Editing 4 Content Video Maheswara',pic:'PRODUKSI',chk:true,real:''},
+  {id:3,w:'11.30 - 12.00',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:true,real:''},
+  {id:4,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:true,real:''},
+  {id:5,w:'13.00 - 14.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:true,real:''},
+  {id:6,w:'14.00 - 14.15',p:'Prepare Shooting Saku Laundry',pic:'PRODUKSI',chk:true,real:''},
+  {id:7,w:'14.15 - 17.45',p:'Shooting Saku Laundry',pic:'PRODUKSI',chk:true,real:''},
+  {id:8,w:'17.45 - 18.00',p:'Update realisasi',pic:'PRODUKSI',chk:true,real:''},
+],
+'2026-06-12':[
+  {id:1,w:'09.00 - 11.00',p:'Meeting Client Glowsence',pic:'PAK AGUNG',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:true,real:''},
+  {id:3,w:'09.15 - 15.00',p:'Editing 10 Content Saku Laundry',pic:'PRODUKSI',chk:false,real:'Baru jadi 8 konten karena kurang B roll dan satu lagi belum shooting'},
+  {id:4,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:true,real:''},
+  {id:6,w:'15.00 - 15.30',p:'QC Content Ke Syafira',pic:'PRODUKSI',chk:true,real:''},
+  {id:7,w:'15.30 - 17.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:true,real:''},
+  {id:8,w:'16.30 - 18.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:9,w:'17.00 - 17.15',p:'Update Shoot List Ke Syafira Untuk Bridestory Fair Dan Wedding Di Balai Sudirman',pic:'PRODUKSI',chk:true,real:''},
+  {id:10,w:'17.15 - 17.50',p:'Bikin shoot list',pic:'PRODUKSI',chk:true,real:''},
+  {id:11,w:'17.50 - 18.00',p:'Update realisasi',pic:'PRODUKSI',chk:true,real:''},
+  {id:12,w:'20.00 - 21.30',p:'Meeting dengan Adrian Laptop',pic:'PAK AGUNG',chk:false,real:''},
+],
+'2026-06-13':[
+  {id:1,w:'09.00 - 18.00',p:'Shooting di JCC',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 18.00',p:'Shooting di JCC',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.00 - 18.00',p:'Shooting di JCC',pic:'PAK AGUNG',chk:false,real:''},
+],
+'2026-06-15':[
+  {id:1,w:'09.00 - 10.30',p:'Update Time Frame 1 Minggu',pic:'PRODUKSI',chk:false,real:''},
+  {id:2,w:'10.30 - 11.00',p:'Editing Saku Laundry',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'11.30 - 12.00',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'13.00 - 13.30',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:6,w:'13.30 - 17.00',p:'Editing 5 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:7,w:'17.00 - 17.20',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'17.20 - 17.50',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'17.50 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-17':[
+  {id:1,w:'08.00 - 09.15',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:2,w:'09.00 - 10.00',p:'Daily update client, Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:3,w:'09.00 - 09.15',p:'Update to do list Editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.15 - 10.00',p:'G-Meet Dengan Pak Agung',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'09.30 - 10.00',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:6,w:'10.00 - 10.30',p:'Brief TikTok Domination (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'10.00 - 12.00',p:'Editing 3 Konten Azkafun',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'10.15 - 11.00',p:'Meeting Client Glowsesnse',pic:'PAK AGUNG',chk:false,real:''},
+  {id:9,w:'10.30 - 11.00',p:'Brief Tale Studio (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'11.00 - 11.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'11.15 - 12.00',p:'Info progress video Saku Laundry',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:14,w:'13.00 - 14.00',p:'Review benchmark Adrian Laptop & catat elemen visual yang bisa diadaptasi',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'13.00 - 13.30',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'13.30 - 14.00',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:17,w:'14.00 - 15.00',p:'Susun positioning Adrian Laptop: fokus utama beli laptop, bukan jual laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'14.00 - 15.00',p:'Editing 2 Konten Saku Laundry',pic:'PRODUKSI',chk:false,real:''},
+  {id:19,w:'15.00 - 16.00',p:'Susun arah brand communication Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'15.00 - 15.30',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:21,w:'15.30 - 17.00',p:'Editing 3 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:22,w:'16.00 - 17.00',p:'QC hasil desain masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:23,w:'17.00 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:24,w:'17.00 - 17.30',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:25,w:'17.30 - 17.50',p:'Revisi (jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:26,w:'17.50 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-18':[
+  {id:1,w:'09.00 - 10.00',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 14.00',p:'Editing 6 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.00 - 10.30',p:'Brief TikTok Domination (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.30 - 11.00',p:'Brief Tale Studio (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.00 - 11.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'11.15 - 12.00',p:'Susun konsep tampilan video Instagram Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:10,w:'13.00 - 14.00',p:'Breakdown konsep Adrian Laptop: 80% beli laptop, 20% jual laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'14.00 - 15.00',p:'Susun draft content plan 1 minggu Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'14.00 - 14.30',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'14.30 - 15.00',p:'Revisi (Jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:14,w:'15.00 - 16.00',p:'Buat contoh angle video: "daripada gadai, jual laptop kamu aja"',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'15.00 - 16.30',p:'Mencari Video Testimoni, BTS, dan Rekomendasi',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'16.00 - 17.00',p:'QC hasil desain & follow up progress editor',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'16.30 - 17.00',p:'Update realisasi',pic:'PRODUKSI',chk:false,real:''},
+  {id:18,w:'17.00 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+],
+'2026-06-19':[
+  {id:1,w:'09.00 - 10.00',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 14.00',p:'Editing 6 Konten Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.00 - 10.30',p:'Brief TikTok Domination (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.00 - 11.30',p:'Meeting Client Joseii',pic:'PAK AGUNG',chk:false,real:''},
+  {id:6,w:'10.30 - 11.00',p:'Brief Tale Studio (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'11.00 - 11.15',p:'Delegasi seluruh brief ke Kak Fani',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'11.15 - 12.00',p:'Finalisasi konsep visual video Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'13.00 - 14.00',p:'Finalisasi brand communication Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'14.00 - 15.00',p:'Finalisasi draft content plan 1 minggu Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'14.00 - 14.30',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:14,w:'14.00 - 15.00',p:'Meeting Client Glowsense',pic:'PAK AGUNG',chk:false,real:''},
+  {id:15,w:'14.30 - 15.00',p:'Revisi (Jika perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'15.00 - 16.00',p:'Rapikan materi Adrian Laptop untuk dikirim/di-present ke client',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'15.00 - 16.30',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+  {id:18,w:'16.00 - 17.00',p:'Evaluasi stok konten Maheswara, TikTok Domination, Tale Studio',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'16.00 - 17.15',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:''},
+  {id:20,w:'16.30 - 17.00',p:'Mencari Video Testimoni, BTS, dan Rekomendasi',pic:'PRODUKSI',chk:false,real:''},
+  {id:21,w:'17.00 - 18.00',p:'Posting seluruh client & schedule konten weekend',pic:'CREATIVE',chk:false,real:''},
+],
+'2026-06-22':[
+  {id:1,w:'08.30 - 09.30',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:true,real:''},
+  {id:2,w:'09.00 - 10.00',p:'Susun timeframe kerja minggu ini',pic:'CREATIVE',chk:true,real:''},
+  {id:3,w:'09.00 - 11.00',p:'Update Time Frame 1 Minggu',pic:'PRODUKSI',chk:true,real:''},
+  {id:4,w:'09.30 - 10.30',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:true,real:''},
+  {id:5,w:'10.00 - 10.30',p:'Review stok Maheswara & cek konten yang habis hari ini',pic:'CREATIVE',chk:true,real:''},
+  {id:6,w:'10.30 - 10.45',p:'Delegasi editing Maheswara: 3 video Wedding Market Fair + 2 video konten reguler',pic:'CREATIVE',chk:true,real:''},
+  {id:7,w:'10.45 - 11.30',p:'Update journey/to-do list Maheswara menuju Wedding Market Fair',pic:'CREATIVE',chk:true,real:''},
+  {id:8,w:'10.45 - 11.30',p:'Meeting Glowssence',pic:'PAK AGUNG',chk:true,real:''},
+  {id:9,w:'11.00 - 11.30',p:'Update stok content Maheswara',pic:'PRODUKSI',chk:true,real:''},
+  {id:10,w:'11.30 - 12.00',p:'Cek flow editing & ACC konten Maheswara',pic:'CREATIVE',chk:true,real:''},
+  {id:11,w:'11.30 - 15.00',p:'Editing 7 Content Maheswara',pic:'PRODUKSI',chk:true,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:true,real:''},
+  {id:13,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:true,real:''},
+  {id:14,w:'13.00 - 14.00',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:true,real:''},
+  {id:15,w:'14.00 - 14.45',p:'Brief Adrian Laptop (3 brief)',pic:'CREATIVE',chk:true,real:''},
+  {id:16,w:'14.45 - 15.00',p:'Brief Azkafun (1 brief)',pic:'CREATIVE',chk:true,real:''},
+  {id:17,w:'15.00 - 15.15',p:'Delegasi brief desain ke Kak Femi',pic:'CREATIVE',chk:true,real:''},
+  {id:18,w:'15.00 - 16.00',p:'QC Content',pic:'PRODUKSI',chk:true,real:''},
+  {id:19,w:'15.15 - 16.45',p:'Upload Thread Maheswara maksimal 6 konten: cari video, download, caption, upload',pic:'CREATIVE',chk:true,real:''},
+  {id:20,w:'16.00 - 17.30',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:true,real:''},
+  {id:21,w:'16.45 - 17.15',p:'Follow up editor & QC hasil masuk',pic:'CREATIVE',chk:true,real:''},
+  {id:22,w:'17.15 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:true,real:''},
+  {id:23,w:'17.30 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:true,real:''},
+],
+'2026-06-23':[
+  {id:1,w:'09.00 - 10.00',p:'Review hasil edit Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 14.00',p:'Editing 7 Content Maheswara',pic:'PRODUKSI',chk:false,real:'Meeting with All Team ATV'},
+  {id:4,w:'10.00 - 10.30',p:'ACC / revisi konten Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'10.30 - 11.00',p:'Follow up kebutuhan Wedding Market Fair',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'11.00 - 12.00',p:'Brief Maheswara (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:9,w:'13.00 - 13.45',p:'Brief Adrian Laptop (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'13.45 - 14.00',p:'Brief Azkafun (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'14.00 - 14.15',p:'Brief TikTok Domination (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'14.00 - 15.00',p:'QC',pic:'PRODUKSI',chk:false,real:'Meeting with Team Adrian Laptop'},
+  {id:13,w:'14.15 - 14.30',p:'Delegasi brief ke Kak Femi',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'14.30 - 16.00',p:'Upload Thread Maheswara (maks. 6 konten)',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'15.00 - 16.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'16.00 - 17.00',p:'Follow up editor & QC desain masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'16.00 - 17.30',p:'Mencari Referensi Content Azkafun',pic:'PRODUKSI',chk:false,real:'Client Azkafun Di hold'},
+  {id:18,w:'17.00 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.30 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-24':[
+  {id:1,w:'09.00 - 10.00',p:'Monitoring konten Maheswara Wedding Market Fair',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 14.00',p:'Editing 7 Content Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.00 - 11.00',p:'Follow up kebutuhan konten event',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'11.00 - 12.00',p:'Pengembangan konsep Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'13.00 - 14.00',p:'Brief Adrian Laptop (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'14.00 - 14.30',p:'Brief Maheswara (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:10,w:'14.00 - 15.00',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:11,w:'14.30 - 14.45',p:'Brief Azkafun (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'14.45 - 15.00',p:'Brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'15.00 - 15.15',p:'Delegasi brief ke Kak Femi',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'15.00 - 16.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'15.15 - 16.45',p:'Upload Thread Maheswara (maks. 6 konten)',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'16.00 - 17.30',p:'Mencari Referensi Content Azkafun',pic:'PRODUKSI',chk:false,real:'Client Azkafun Di hold'},
+  {id:17,w:'16.45 - 17.15',p:'QC hasil desain masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'17.15 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.30 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-25':[
+  {id:1,w:'09.00 - 10.00',p:'Review progres seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:2,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:3,w:'09.15 - 14.00',p:'Editing 7 Content Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'10.00 - 11.00',p:'Finalisasi positioning Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:5,w:'11.00 - 12.00',p:'Finalisasi content plan Adrian Laptop',pic:'CREATIVE',chk:false,real:''},
+  {id:6,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:8,w:'13.00 - 14.00',p:'Brief Adrian Laptop (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'14.00 - 16.30',p:'Training tim Adrian Laptop',pic:'PAK AGUNG',chk:false,real:''},
+  {id:10,w:'14.00 - 14.30',p:'Brief Maheswara (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'14.00 - 15.00',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:12,w:'14.30 - 15.00',p:'Brief Azkafun (2 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:13,w:'15.00 - 15.15',p:'Brief Tale Studio (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'15.00 - 16.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:15,w:'15.15 - 15.30',p:'Delegasi brief ke Kak Femi',pic:'CREATIVE',chk:false,real:''},
+  {id:16,w:'15.30 - 17.00',p:'Upload Thread Maheswara (maks. 6 konten)',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'16.00 - 17.30',p:'Mencari Referensi Content Azkafun',pic:'PRODUKSI',chk:false,real:'Azkafun Di hold'},
+  {id:18,w:'17.00 - 17.30',p:'Schedule posting weekend',pic:'CREATIVE',chk:false,real:''},
+  {id:19,w:'17.30 - 18.00',p:'Susun prioritas minggu depan',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'17.30 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-26':[
+  {id:1,w:'08.30 - 09.30',p:'Meeting Client Qwell',pic:'PAK AGUNG',chk:false,real:'Mundur jadi 16.30'},
+  {id:2,w:'09.00 - 10.00',p:'Susun timeframe kerja minggu ini',pic:'CREATIVE',chk:false,real:''},
+  {id:3,w:'09.00 - 09.15',p:'Update to do list editing',pic:'PRODUKSI',chk:false,real:''},
+  {id:4,w:'09.15 - 14.00',p:'Editing 7 Content Maheswara',pic:'PRODUKSI',chk:false,real:''},
+  {id:5,w:'09.30 - 10.30',p:'Meeting Client Josei',pic:'PAK AGUNG',chk:false,real:''},
+  {id:6,w:'10.00 - 10.30',p:'Review stok Maheswara & cek konten yang habis hari ini',pic:'CREATIVE',chk:false,real:''},
+  {id:7,w:'10.30 - 10.45',p:'Delegasi editing Maheswara: 3 video Wedding Market Fair + 2 video konten reguler',pic:'CREATIVE',chk:false,real:''},
+  {id:8,w:'10.45 - 11.30',p:'Update journey/to-do list Maheswara menuju Wedding Market Fair',pic:'CREATIVE',chk:false,real:''},
+  {id:9,w:'10.45 - 11.30',p:'Meeting Glowssence',pic:'PAK AGUNG',chk:false,real:'Mundur jadi besok'},
+  {id:10,w:'11.30 - 12.00',p:'Cek flow editing & ACC konten Maheswara',pic:'CREATIVE',chk:false,real:''},
+  {id:11,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:false,real:''},
+  {id:12,w:'12.00 - 13.00',p:'Istirahat',pic:'PRODUKSI',chk:false,real:''},
+  {id:13,w:'13.00 - 14.00',p:'Brief Maheswara (4 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:14,w:'14.00 - 14.45',p:'Brief Adrian Laptop (3 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:15,w:'14.00 - 15.00',p:'QC',pic:'PRODUKSI',chk:false,real:''},
+  {id:16,w:'14.45 - 15.00',p:'Brief Azkafun (1 brief)',pic:'CREATIVE',chk:false,real:''},
+  {id:17,w:'15.00 - 15.15',p:'Delegasi brief desain ke Kak Femi',pic:'CREATIVE',chk:false,real:''},
+  {id:18,w:'15.00 - 16.00',p:'Revisi (Jika Perlu)',pic:'PRODUKSI',chk:false,real:''},
+  {id:19,w:'15.15 - 16.45',p:'Upload Thread Maheswara maksimal 6 konten: cari video, download, caption, upload',pic:'CREATIVE',chk:false,real:''},
+  {id:20,w:'16.00 - 17.30',p:'Mencari Referensi Content Azkafun',pic:'PRODUKSI',chk:false,real:'Azkafun Di hold'},
+  {id:21,w:'16.45 - 17.15',p:'Follow up editor & QC hasil masuk',pic:'CREATIVE',chk:false,real:''},
+  {id:22,w:'17.15 - 18.00',p:'Posting seluruh client',pic:'CREATIVE',chk:false,real:''},
+  {id:23,w:'17.30 - 18.00',p:'Update Realisasi',pic:'PRODUKSI',chk:false,real:''},
+],
+'2026-06-29':[
+  {id:1,w:'09.00 - 09.15',p:'Daily update Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:2,w:'09.15 - 10.00',p:'Review content plan Pak Agung & konsep campaign Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:3,w:'10.00 - 10.30',p:'Delegasi redesign deck Adrian Laptop ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:4,w:'10.30 - 11.00',p:'Mencari dan menyematkan foto ke Canva untuk kebutuhan deck Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:5,w:'11.00 - 11.15',p:'Follow up ACC desain OrthoJack ke KTR (status: menunggu approval owner)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:6,w:'11.15 - 12.00',p:'Quick meeting',pic:'PAK AGUNG',chk:true,real:''},
+  {id:7,w:'12.00 - 12.30',p:'Brief 1 carousel Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:8,w:'12.30 - 13.30',p:'Istirahat',pic:'PAK AGUNG',chk:true,real:''},
+  {id:9,w:'13.30 - 14.00',p:'Follow up pengiriman foto Adrian Laptop untuk kebutuhan desain',pic:'PAK AGUNG',chk:true,real:''},
+  {id:10,w:'14.00 - 14.45',p:'Delegasi 3 brief carousel OrthoJack ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:11,w:'14.45 - 15.15',p:'Review CP Adrian Laptop yang dapat dikerjakan hari ini & besok',pic:'PAK AGUNG',chk:true,real:''},
+  {id:12,w:'15.15 - 15.30',p:'Follow up kembali pengiriman foto Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:13,w:'15.30 - 16.30',p:'Delegasi 2 opsi desain Adrian Laptop: (1) foto karyawan, (2) foto Canva berhijab',pic:'PAK AGUNG',chk:true,real:''},
+  {id:14,w:'16.30 - 17.00',p:'Follow up kembali ACC desain OrthoJack ke KTR (masih menunggu approval owner)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:15,w:'17.00 - 17.15',p:'Follow up ketiga pengiriman foto Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:16,w:'17.15 - 18.00',p:'Review desain deck Adrian Laptop (cek desain & take out beberapa teks)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:17,w:'18.00 - 19.00',p:'Menyusun timeline terbaru Maheswara menuju Wedding Market Fair Balai Kartini',pic:'PAK AGUNG',chk:true,real:''},
+  {id:18,w:'19.00 - 20.00',p:'Upload konten Maheswara & schedule konten besok: desain feed, reels Instagram, dan TikTok mirror',pic:'PAK AGUNG',chk:true,real:''},
+],
+'2026-06-30':[
+  {id:1,w:'09.00 - 09.15',p:'Review brief OrthoJack dan cek kebutuhan revisi',pic:'PAK AGUNG',chk:true,real:''},
+  {id:2,w:'09.15 - 09.30',p:'Delegasi desain Adrian Laptop ke Kak Feni sambil menunggu pengerjaan brief OrthoJack',pic:'PAK AGUNG',chk:true,real:''},
+  {id:3,w:'09.30 - 10.00',p:'Daily update ke grup Adrian Laptop & menyusun to-do list hari ini',pic:'PAK AGUNG',chk:true,real:''},
+  {id:4,w:'10.00 - 10.15',p:'Daily update ke grup OrthoJack & menyusun to-do list tim ATV hari ini',pic:'PAK AGUNG',chk:true,real:''},
+  {id:5,w:'10.15 - 11.45',p:'Revisi 3 brief carousel OrthoJack, melengkapi visual guide, mencari referensi & contoh visual desain feed',pic:'PAK AGUNG',chk:true,real:''},
+  {id:6,w:'11.45 - 12.00',p:'Delegasi 3 brief OrthoJack ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:7,w:'12.00 - 13.00',p:'Istirahat',pic:'PAK AGUNG',chk:true,real:''},
+  {id:8,w:'13.00 - 13.45',p:'Review brief Adrian Laptop yang perlu direvisi dan menentukan desain dengan 2 opsi',pic:'PAK AGUNG',chk:true,real:''},
+  {id:9,w:'13.45 - 14.15',p:'Delegasi revisi brief Adrian Laptop ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:10,w:'14.15 - 15.00',p:'Cek stok konten Maheswara (video & desain)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:11,w:'15.00 - 15.45',p:'QC 4 video Maheswara, revisi 1 video, dan delegasi revisi ke Danar',pic:'PAK AGUNG',chk:true,real:''},
+  {id:12,w:'15.45 - 16.00',p:'QC ulang hasil revisi video Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+  {id:13,w:'16.00 - 16.20',p:'QC hasil desain OrthoJack',pic:'PAK AGUNG',chk:true,real:''},
+  {id:14,w:'16.20 - 16.45',p:'Menyusun daftar 8 desain Maheswara untuk diajukan ACC ke Ibu Maya',pic:'PAK AGUNG',chk:true,real:''},
+  {id:15,w:'16.45 - 17.00',p:'Menyusun daftar 4 video Maheswara untuk diajukan ACC ke Ibu Maya',pic:'PAK AGUNG',chk:true,real:''},
+  {id:16,w:'17.00 - 17.10',p:'Share link ACC video Maheswara ke Ibu Maya',pic:'PAK AGUNG',chk:true,real:''},
+  {id:17,w:'17.10 - 17.20',p:'Share link video posted ads Maheswara ke Pak Agung',pic:'PAK AGUNG',chk:true,real:''},
+  {id:18,w:'17.20 - 17.45',p:'Merapikan timeline Maheswara & share link timeline ke Ibu Maya',pic:'PAK AGUNG',chk:true,real:''},
+  {id:19,w:'17.45 - 18.15',p:'QC hasil desain Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:20,w:'18.15 - 18.35',p:'Menyusun list hasil desain Adrian Laptop & share ke grup untuk proses ACC',pic:'PAK AGUNG',chk:true,real:''},
+  {id:21,w:'18.35 - 18.50',p:'Share update output desain OrthoJack ke grup New Traffic beserta info revisi',pic:'PAK AGUNG',chk:true,real:''},
+  {id:22,w:'18.50 - 19.00',p:'Delegasi copy folder dokumentasi Maheswara ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:23,w:'19.00 - 19.15',p:'Upload feed Maheswara & menyiapkan caption',pic:'PAK AGUNG',chk:true,real:''},
+  {id:24,w:'09.00 - 09.15',p:'Cek grup Maheswara, merespons revisi, feedback, dan permintaan terbaru dari Ibu Maya',pic:'CREATIVE',chk:true,real:''},
+  {id:25,w:'09.15 - 09.30',p:'Daily update grup Adrian Laptop & follow up ACC desain yang telah disubmit',pic:'CREATIVE',chk:true,real:''},
+  {id:26,w:'09.30 - 09.45',p:'Daily update grup OrthoJack',pic:'CREATIVE',chk:true,real:''},
+  {id:27,w:'09.45 - 10.00',p:'Delegasi revisi video Maheswara ke Danar (penambahan disclaimer video)',pic:'CREATIVE',chk:true,real:''},
+  {id:28,w:'10.00 - 11.30',p:'Call dengan Pak Agung: progress Adrian Laptop & OrthoJack, review ±10 checklist',pic:'CREATIVE',chk:false,real:'belum acc upload orthojack'},
+  {id:29,w:'11.30 - 12.00',p:'Koordinasi dengan Mbak Vera terkait follow up ACC desain',pic:'CREATIVE',chk:true,real:''},
+  {id:30,w:'12.00 - 13.00',p:'Istirahat',pic:'CREATIVE',chk:true,real:''},
+  {id:31,w:'13.00 - 14.00',p:'Delegasi revisi 4 desain Adrian Laptop menggunakan foto karyawan sebagai visual utama',pic:'CREATIVE',chk:true,real:''},
+  {id:32,w:'14.00 - 15.00',p:'Lanjutan koordinasi revisi desain Adrian Laptop & follow up progress designer',pic:'CREATIVE',chk:true,real:''},
+  {id:33,w:'15.00 - 15.15',p:'Meminta akses login Instagram Adrian Laptop',pic:'CREATIVE',chk:true,real:'done'},
+  {id:34,w:'15.15 - 15.30',p:'Meminta akses login akun OrthoJack',pic:'CREATIVE',chk:true,real:'akses berhasil diterima'},
+  {id:35,w:'15.30 - 16.30',p:'Follow up ACC desain terbaru & pengecekan progress pekerjaan yang masih berjalan',pic:'CREATIVE',chk:true,real:''},
+  {id:36,w:'16.30 - 17.00',p:'Follow up ACC caption konten Maheswara',pic:'CREATIVE',chk:true,real:''},
+  {id:37,w:'17.00 - 18.00',p:'Final pengecekan konten yang akan dipublikasikan',pic:'CREATIVE',chk:true,real:''},
+  {id:38,w:'18.00 - 18.20',p:'Upload feed Instagram Adrian Laptop & mirroring ke Instagram Story',pic:'CREATIVE',chk:true,real:''},
+  {id:39,w:'21.30 - 21.45',p:'Upload konten Maheswara: Feed Instagram, Reels Instagram, dan TikTok',pic:'CREATIVE',chk:true,real:''},
+],
+'2026-07-02':[
+  {id:1,w:'09.00 - 09.15',p:'Daily update grup Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:2,w:'09.15 - 09.45',p:'Update grup & diskusi dengan Mas Inal terkait agenda meeting pukul 10.00',pic:'PAK AGUNG',chk:true,real:''},
+  {id:3,w:'09.45 - 10.00',p:'Delegasi pembuatan desain Adrian Laptop versi opsi 2 ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:4,w:'10.00 - 10.30',p:'Meeting bersama tim OrthoJack',pic:'PAK AGUNG',chk:true,real:''},
+  {id:5,w:'10.30 - 11.00',p:'Menyusun Minutes of Meeting (MoM) hasil diskusi ke Pak Agung & grup Orthojack',pic:'PAK AGUNG',chk:true,real:''},
+  {id:6,w:'11.00 - 13.00',p:'Menyusun 6 brief mockup desain OrthoJack (opsi 1 & opsi 2)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:7,w:'13.00 - 14.00',p:'Istirahat',pic:'PAK AGUNG',chk:true,real:''},
+  {id:8,w:'14.00 - 14.45',p:'QC 3 video Maheswara & delegasi revisi 1 video ke Danang',pic:'PAK AGUNG',chk:true,real:''},
+  {id:9,w:'14.45 - 15.00',p:'Delegasi copy folder dokumentasi Maheswara ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:10,w:'15.00 - 16.00',p:'Review hasil draft desain mockup OrthoJack & revisi visual (ganti foto dokter jadi foto Athalla/BABA)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:11,w:'16.00 - 16.30',p:'Finalisasi revisi mockup OrthoJack & pengecekan ulang desain',pic:'PAK AGUNG',chk:true,real:''},
+  {id:12,w:'16.30 - 17.00',p:'Minta approval hasil desain ke Pak Agung',pic:'PAK AGUNG',chk:true,real:''},
+  {id:13,w:'17.00 - 17.30',p:'Share hasil desain ke tim setelah approval',pic:'PAK AGUNG',chk:true,real:''},
+  {id:14,w:'19.00 - 19.15',p:'Upload konten Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:15,w:'20.00 - 20.15',p:'Upload feed Instagram Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+  {id:16,w:'21.00 - 21.15',p:'Upload Reels Instagram & TikTok Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+],
+'2026-07-03':[
+  {id:1,w:'09.00 - 09.15',p:'Daily update grup Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:2,w:'09.15 - 09.45',p:'Cek grup OrthoJack, menanggapi diskusi, share hasil mockup Instagram, delegasi revisi 1 mockup ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:3,w:'09.45 - 11.00',p:'Menyusun 3 brief carousel Adrian Laptop',pic:'PAK AGUNG',chk:true,real:''},
+  {id:4,w:'11.00 - 12.00',p:'Menyusun 3 brief feed Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+  {id:5,w:'12.00 - 13.00',p:'Istirahat',pic:'PAK AGUNG',chk:true,real:''},
+  {id:6,w:'13.00 - 14.00',p:'Menyusun 1 brief carousel OrthoJack (materi dari video Dr. Jaka)',pic:'PAK AGUNG',chk:true,real:''},
+  {id:7,w:'14.30 - 14.45',p:'Share hasil revisi mockup OrthoJack ke grup',pic:'PAK AGUNG',chk:true,real:''},
+  {id:8,w:'14.45 - 15.30',p:'Delegasi 3 brief Maheswara & 3 brief Adrian Laptop ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:9,w:'15.30 - 16.00',p:'QC & revisi video orthojack & delegasi copy folder dokumentasi Maheswara ke Kak Feni',pic:'PAK AGUNG',chk:true,real:''},
+  {id:10,w:'16.00 - 17.30',p:'Monitoring progress desain & follow up pengerjaan',pic:'PAK AGUNG',chk:true,real:''},
+  {id:11,w:'18.00 - 18.25',p:'QC video Maheswara & info video ads Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+  {id:12,w:'18.25 - 18.45',p:'Drafting 5 video Maheswara untuk diajukan ke grup',pic:'PAK AGUNG',chk:true,real:''},
+  {id:13,w:'18.45 - 19.00',p:'Share 5 video Maheswara ke grup untuk proses ACC',pic:'PAK AGUNG',chk:true,real:''},
+  {id:14,w:'19.00 - 19.15',p:'Upload feed Instagram Maheswara & menyiapkan caption',pic:'PAK AGUNG',chk:true,real:''},
+  {id:15,w:'19.15 - 19.30',p:'Upload feed Adrian Laptop & schedule feed untuk Sabtu',pic:'PAK AGUNG',chk:true,real:''},
+  {id:16,w:'19.30 - 20.00',p:'Schedule feed Instagram Maheswara untuk posting berikutnya',pic:'PAK AGUNG',chk:true,real:''},
+  {id:17,w:'21.30 - 21.45',p:'Upload Reels Instagram & TikTok Maheswara',pic:'PAK AGUNG',chk:true,real:''},
+]};
+
+// ══ KALENDER ════════════════════════════════════════════
+const BLN=['','Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const BLN_F=['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HRI=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const PIC_ORDER=['PAK AGUNG','CREATIVE','PRODUKSI','DESIGNER'];
+const LIBUR={'2026-05-27':'Idul Adha','2026-05-30':'Cuti Bersama','2026-06-01':'Hari Lahir Pancasila','2026-06-13':'Akhir Pekan','2026-06-16':'Tahun Baru Islam 1448 H','2026-08-17':'HUT RI'};
+
+function isoDate(d){return d.toISOString().slice(0,10);}
+function mondayOf(d){const x=new Date(d);const day=x.getDay();x.setDate(x.getDate()+(day===0?-6:1-day));return x;}
+function buildWeeks(s,e){
+  let cur=mondayOf(new Date(s+'T00:00:00'));const end=new Date(e+'T00:00:00'),weeks=[],mc={};
+  while(cur<=end){
+    const dates=[];for(let i=0;i<7;i++){const dd=new Date(cur);dd.setDate(cur.getDate()+i);dates.push(isoDate(dd));}
+    const ref=new Date(dates[2]+'T00:00:00');const mk=ref.getFullYear()+'-'+(ref.getMonth()+1);mc[mk]=(mc[mk]||0)+1;
+    weeks.push({lbl:`W${mc[mk]} ${BLN_F[ref.getMonth()+1].slice(0,3)}`,monthName:BLN_F[ref.getMonth()+1],year:ref.getFullYear(),dates});
+    cur=new Date(cur);cur.setDate(cur.getDate()+7);
+  }
+  return weeks;
+}
+function futureEnd(){const e=new Date();e.setMonth(e.getMonth()+3);return isoDate(e);}
+const ALL_WEEKS=buildWeeks('2026-05-25',futureEnd());
+
+// ══ STATE ═══════════════════════════════════════════════
+let DATA={},role='',myPic='',activeWeek=0,activeFilter='ALL';
+let editId=null,editDate=null,modalMode='add',syncTimer=null,lastHash='';
+
+function today(){const n=new Date();return`${n.getFullYear()}-${z(n.getMonth()+1)}-${z(n.getDate())}`;}
+function z(n){return String(n).padStart(2,'0');}
+function weekIdxOf(dateStr){return ALL_WEEKS.findIndex(w=>w.dates.includes(dateStr));}
+function isRO(d){
+  const tIdx=weekIdxOf(today());
+  const dIdx=weekIdxOf(d);
+  if(tIdx<0||dIdx<0)return false;
+  return (tIdx-dIdx)>=2; // terkunci begitu sudah 2 minggu berlalu (mis. W3 terkunci pas masuk Senin W5)
+}
+function getPwd(){return localStorage.getItem(PWKEY)||'atv2026';}
+function hsh(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h.toString(36);}
+function pt(w){const r=w.replace(/\./g,':').replace(/\s/g,'').split('-')[0];const[h,m]=r.split(':').map(Number);return h*60+(m||0);}
+function sortT(a){return[...a].sort((x,y)=>pt(x.w)-pt(y.w)||PIC_ORDER.indexOf(x.pic)-PIC_ORDER.indexOf(y.pic));}
+
+// ── TIME FORMAT ──────────────────────────────────────────
+function fmtOne(s){
+  const d=s.replace(/\D/g,'');if(!d)return s;
+  const n=d.padStart(4,'0').slice(0,4);
+  return n.slice(0,2)+'.'+n.slice(2);
+}
+function autoFmt(el){
+  let v=el.value.trim();if(!v)return;
+  const m=v.match(/^([^-–]+)[-–](.+)$/);
+  el.value=m?fmtOne(m[1].trim())+' - '+fmtOne(m[2].trim()):fmtOne(v);
+}
+
+// ══ FIREBASE REST ════════════════════════════════════════
+// Arsitek: tanggal SEED yang belum pernah diedit strukturnya (plan/waktu/pic/jumlah task)
+// cukup simpan delta (chk+real) — hemat payload. Begitu diedit (di window 2 minggu),
+// otomatis "naik kelas" jadi full-save permanen (format self-detecting: delta = {id,chk,real}
+// tanpa field w/p/pic; full = task lengkap). Tanggal live (di luar SEED) selalu full.
+
+function isStructModified(k){
+  const seedList=SEED[k]||[];
+  const cur=DATA[k]||[];
+  if(cur.length!==seedList.length)return true;
+  const seedMap={};seedList.forEach(t=>seedMap[t.id]=t);
+  return cur.some(t=>{
+    const s=seedMap[t.id];
+    return !s||s.w!==t.w||s.p!==t.p||s.pic!==t.pic;
+  });
+}
+
+function getPayload(){
+  const p={};
+  Object.keys(DATA).forEach(k=>{
+    if((k in SEED)&&!isStructModified(k)) p[k]=(DATA[k]||[]).map(t=>({id:t.id,chk:t.chk,real:t.real}));
+    else p[k]=DATA[k];
+  });
+  return p;
+}
+
+function mergeCloud(cloud){
+  const base=JSON.parse(JSON.stringify(SEED));
+  if(!cloud)return base;
+  Object.keys(cloud).forEach(k=>{
+    const arr=cloud[k]||[];
+    const seedList=SEED[k]||[];
+    if((k in SEED)&&seedList.length>0&&arr.length===0){
+      base[k]=[]; // semua task tanggal ini sengaja dihapus user
+      return;
+    }
+    const looksLikeDelta=arr.length>0&&arr.every(x=>x&&typeof x==='object'&&!('w' in x));
+    if((k in SEED)&&looksLikeDelta){
+      const m={};arr.forEach(x=>{m[x.id]=x;});
+      (base[k]||[]).forEach(t=>{if(m[t.id]){t.chk=m[t.id].chk;t.real=m[t.id].real||'';}});
+    }else{
+      base[k]=arr;
+    }
+  });
+  return base;
+}
+
+async function dbGet(){
+  try{
+    const r=await fetch(`${FB_URL}/${FB_NODE}.json`,{cache:'no-store'});
+    if(!r.ok)return null;return await r.json();
+  }catch{return null;}
+}
+
+async function dbSet(payload){
+  try{
+    const r=await fetch(`${FB_URL}/${FB_NODE}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    return r.ok;
+  }catch{return false;}
+}
+
+function setSyncUI(st,txt){
+  const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');
+  if(!d)return;d.className='dot'+(st==='s'?' s':st==='e'?' e':'');t.textContent=txt;
+}
+
+async function doSync(quiet=false){
+  if(!quiet)setSyncUI('s','Sinkronisasi...');
+  const cloud=await dbGet();
+  if(cloud!==null){
+    const h=hsh(JSON.stringify(cloud));
+    if(h!==lastHash){
+      DATA=mergeCloud(cloud);lastHash=h;lSave();renderAll();
+    }
+    setSyncUI('ok','🟢 Tersinkron · '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}));
+  }else{
+    setSyncUI('e','🔴 Offline · data lokal');
+  }
+}
+
+async function push(){
+  setSyncUI('s','Menyimpan...');
+  lSave();
+  const payload=getPayload();
+  const ok=await dbSet(payload);
+  if(ok){lastHash=hsh(JSON.stringify(payload));}
+  setSyncUI(ok?'ok':'e',ok?'✅ Tersimpan · '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'⚠️ Gagal sync · data lokal OK');
+  // Backup otomatis ke Google Sheets (silent, tidak mengganggu UX Firebase)
+  if(getSheetsAuto()&&getSheetsUrl()){syncToSheets(true).catch(()=>{});}
+}
+
+function startSync(){
+  if(syncTimer)clearInterval(syncTimer);
+  // Poll setiap 5 detik — semua device auto-update dalam max 5 detik
+  syncTimer=setInterval(()=>doSync(true),5000);
+}
+
+// ── LOCAL STORAGE (cache) ────────────────────────────────
+function lSave(){
+  try{localStorage.setItem(LSKEY,JSON.stringify(getPayload()));}catch{}
+}
+function lLoad(){
+  // Mulai dari SEED, lalu overlay dengan localStorage cache
+  DATA=JSON.parse(JSON.stringify(SEED));
+  try{
+    const s=localStorage.getItem(LSKEY);if(!s)return;
+    const saved=JSON.parse(s);
+    DATA=mergeCloud(saved);
+  }catch{}
+}
+
+// ══ SETUP ════════════════════════════════════════════════
+function saveConfig(){
+  const raw=document.getElementById('fbUrlIn').value.trim();
+  const url=raw.replace(/\/+$/,''); // hapus trailing slash
+  const err=document.getElementById('setupErr');
+  err.textContent='';
+
+  if(!url){err.textContent='URL tidak boleh kosong.';return;}
+  if(!url.startsWith('https://')){err.textContent='URL harus dimulai dengan https://';return;}
+  if(!url.toLowerCase().includes('firebase')){err.textContent='Sepertinya bukan URL Firebase. Contoh: https://nama-project-default-rtdb.firebaseio.com';return;}
+
+  // Simpan langsung — koneksi dicek otomatis saat sync pertama
+  // (Catatan: FB_URL sudah tertanam di kode; layar setup ini tidak lagi dipakai di alur normal)
+  document.getElementById('sSetup').style.display='none';
+  document.getElementById('sRole').style.display='flex';
+}
+
+function resetFbConfig(){
+  alert('Firebase URL sudah tertanam di kode. Hubungi admin untuk ganti database.');
+}
+
+// ══ GOOGLE SHEETS BACKUP ═════════════════════════════════
+// Firebase tetap SUMBER UTAMA. Sheets hanya backup/arsip sekunder.
+const SHEETS_URL_KEY='atv_sheets_url';
+const SHEETS_PWD_KEY='atv_sheets_pwd';
+const SHEETS_AUTO_KEY='atv_sheets_auto';
+const SHEETS_LAST_KEY='atv_sheets_last';
+function getSheetsUrl(){return localStorage.getItem(SHEETS_URL_KEY)||'';}
+function getSheetsPwd(){return localStorage.getItem(SHEETS_PWD_KEY)||'sheets2026';}
+function getSheetsAuto(){return localStorage.getItem(SHEETS_AUTO_KEY)==='1';}
+
+// Kode Apps Script siap-tempel — doGet untuk baca/test, doPost untuk tulis backup
+const APPS_SCRIPT_CODE=`function doGet(e){
+  var ss=SpreadsheetApp.getActiveSpreadsheet();
+  var action=e&&e.parameter&&e.parameter.action;
+  if(action==='readAll'){
+    var pics=['PAK AGUNG','CREATIVE','PRODUKSI','DESIGNER'];
+    var out={};
+    pics.forEach(function(p){
+      var sh=ss.getSheetByName(p);
+      out[p]=sh?sh.getDataRange().getValues():[[]];
+    });
+    return ContentService.createTextOutput(JSON.stringify({status:'ok',sheets:out})).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({status:'ok',time:new Date().toISOString()})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function writeSheet_(ss,name,header,rows){
+  var sh=ss.getSheetByName(name);
+  if(!sh) sh=ss.insertSheet(name);
+  sh.clearContents();
+  var all=[header].concat(rows);
+  sh.getRange(1,1,all.length,header.length).setValues(all);
+  sh.setFrozenRows(1);
+  return sh;
+}
+
+function doPost(e){
+  try{
+    var data=JSON.parse(e.postData.contents);
+    var ss=SpreadsheetApp.getActiveSpreadsheet();
+    writeSheet_(ss,'Backup',['Tanggal ISO','Hari','Waktu','Plan / Kegiatan','PIC','Selesai','Realisasi / Catatan'],
+      data.map(function(r){return [r.iso,r.hari,r.waktu,r.plan,r.pic,r.selesai,r.realisasi];}));
+    ['PAK AGUNG','CREATIVE','PRODUKSI','DESIGNER'].forEach(function(pic){
+      var rows=data.filter(function(r){return r.pic===pic;}).map(function(r){
+        return [r.iso+'_'+r.id,r.iso,r.hari,r.waktu,r.plan,r.selesai,r.realisasi];
+      });
+      var sh=writeSheet_(ss,pic,['RowKey','Tanggal ISO','Hari','Waktu','Plan / Kegiatan','Selesai','Realisasi / Catatan'],rows);
+      var last=sh.getLastRow();
+      if(last>1) sh.getRange(2,6,last-1,1).setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['Ya','Tidak']).build());
+    });
+    return ContentService.createTextOutput(JSON.stringify({status:'ok',rows:data.length})).setMimeType(ContentService.MimeType.JSON);
+  }catch(err){
+    return ContentService.createTextOutput(JSON.stringify({status:'error',message:String(err)})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+function openSheetsPwd(){
+  document.getElementById('spwdIn').value='';
+  document.getElementById('spwdErr').textContent='';
+  document.getElementById('mSheetsPwd').style.display='flex';
+}
+function loginSheets(){
+  const v=document.getElementById('spwdIn').value;
+  if(v===getSheetsPwd()){closeM('mSheetsPwd');openSheetsSetup();}
+  else{document.getElementById('spwdErr').textContent='Password salah.';}
+}
+function saveSheetsPwd(){
+  const p1=document.getElementById('sp1').value,p2=document.getElementById('sp2').value;
+  if(!p1){document.getElementById('spErr2').textContent='Tidak boleh kosong.';return;}
+  if(p1!==p2){document.getElementById('spErr2').textContent='Tidak cocok.';return;}
+  localStorage.setItem(SHEETS_PWD_KEY,p1);
+  document.getElementById('spErr2').textContent='';
+  alert('Password Sheets diubah!');
+}
+
+function openSheetsSetup(){
+  document.getElementById('sheetsWaUrl').value=getSheetsUrl();
+  document.getElementById('appsScriptCode').value=APPS_SCRIPT_CODE;
+  const auto=getSheetsAuto();
+  document.getElementById('sheetsAutoToggle').checked=auto;
+  updateAutoSlider(auto);
+  const last=localStorage.getItem(SHEETS_LAST_KEY);
+  document.getElementById('sheetsLastSync').textContent=last?('Terakhir: '+last):'Belum pernah sync';
+  const st=document.getElementById('sheetsStatus');
+  st.textContent=getSheetsUrl()?'🔗 URL tersimpan.':'Belum ada URL tersimpan.';
+  st.style.color='rgba(21,18,15,.4)';
+  document.getElementById('mSheetsSetup').style.display='flex';
+}
+
+function updateAutoSlider(on){
+  const slider=document.getElementById('sheetsToggleSlider');
+  if(!slider.querySelector('#sheetsKnob')){
+    slider.innerHTML='<span id="sheetsKnob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></span>';
+  }
+  slider.style.background=on?'#1a7a3c':'#ccc';
+  document.getElementById('sheetsKnob').style.transform=on?'translateX(20px)':'translateX(0)';
+}
+
+function toggleSheetsAutoSync(){
+  const on=document.getElementById('sheetsAutoToggle').checked;
+  localStorage.setItem(SHEETS_AUTO_KEY,on?'1':'0');
+  updateAutoSlider(on);
+}
+
+function saveSheetsConfig(){
+  const url=document.getElementById('sheetsWaUrl').value.trim().replace(/\/+$/,'');
+  const st=document.getElementById('sheetsStatus');
+  if(!url){st.textContent='❌ URL tidak boleh kosong.';st.style.color='#c0392b';return;}
+  if(!url.startsWith('https://script.google.com/')){st.textContent='❌ URL harus dari script.google.com (Apps Script Web App).';st.style.color='#c0392b';return;}
+  localStorage.setItem(SHEETS_URL_KEY,url);
+  st.textContent='✅ URL tersimpan. Klik "Test Koneksi".';st.style.color='var(--grn)';
+}
+
+async function testSheetsConn(){
+  const url=getSheetsUrl();const st=document.getElementById('sheetsStatus');
+  if(!url){st.textContent='❌ Simpan URL dulu.';st.style.color='#c0392b';return;}
+  st.textContent='🔄 Menguji koneksi...';st.style.color='rgba(21,18,15,.4)';
+  try{
+    const r=await fetch(url,{method:'GET'});
+    const j=await r.json();
+    if(j&&j.status==='ok'){st.textContent='✅ Koneksi berhasil! Sheets siap dipakai.';st.style.color='var(--grn)';}
+    else{st.textContent='⚠️ Terhubung tapi respons tidak dikenali.';st.style.color='#b8860b';}
+  }catch(err){st.textContent='❌ Gagal konek. Cek URL & pastikan akses "Anyone".';st.style.color='#c0392b';}
+}
+
+async function pullFromSheetsInternal(){
+  const url=getSheetsUrl();if(!url)return false;
+  try{
+    const r=await fetch(url+'?action=readAll');
+    const j=await r.json();
+    if(!j||j.status!=='ok'||!j.sheets)return false;
+    let changed=false;
+    PIC_ORDER.forEach(pic=>{
+      const rows=j.sheets[pic]||[];
+      rows.slice(1).forEach(row=>{
+        const key=String(row[0]||'');const us=key.lastIndexOf('_');if(us<1)return;
+        const iso=key.slice(0,us),id=parseInt(key.slice(us+1),10);
+        const t=(DATA[iso]||[]).find(x=>x.id===id);if(!t)return;
+        const chk=String(row[5])==='Ya',real=String(row[6]||'');
+        if(t.chk!==chk||t.real!==real){t.chk=chk;t.real=real;changed=true;}
+      });
+    });
+    if(changed){lSave();renderAll();await dbSet(getPayload());}
+    return changed;
+  }catch{return false;}
+}
+
+async function syncToSheets(silent){
+  const url=getSheetsUrl();
+  if(!url){if(!silent)alert('Simpan URL Web App Sheets dulu.');return false;}
+  const st=document.getElementById('sheetsStatus');
+  if(!silent&&st){st.textContent='📤 Mengirim ke Sheets...';st.style.color='rgba(21,18,15,.4)';}
+  try{
+    await pullFromSheetsInternal();
+    const rows=getRows();
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rows)});
+    const j=await r.json();
+    const ok=j&&j.status==='ok';
+    const now=new Date().toLocaleString('id-ID');
+    if(ok)localStorage.setItem(SHEETS_LAST_KEY,now);
+    if(!silent&&st){st.textContent=ok?('✅ Tersimpan ke Sheets · '+now):'❌ Gagal simpan ke Sheets.';st.style.color=ok?'var(--grn)':'#c0392b';}
+    const lastEl=document.getElementById('sheetsLastSync');if(lastEl&&ok)lastEl.textContent='Terakhir: '+now;
+    return ok;
+  }catch(err){
+    if(!silent&&st){st.textContent='❌ Gagal konek ke Sheets.';st.style.color='#c0392b';}
+    return false;
+  }
+}
+
+async function syncFromSheets(){
+  const url=getSheetsUrl();const st=document.getElementById('sheetsStatus');
+  if(!url){alert('Simpan URL Web App Sheets dulu.');return;}
+  if(!confirm('Ambil update dari Spreadsheet (centang & catatan yang diisi tim langsung di Sheets) ke aplikasi?'))return;
+  st.textContent='📥 Mengambil dari Sheets...';st.style.color='rgba(21,18,15,.4)';
+  const changed=await pullFromSheetsInternal();
+  st.textContent=changed?'✅ Data ter-update dari Sheets.':'ℹ️ Tidak ada perubahan baru di Sheets.';
+  st.style.color=changed?'var(--grn)':'rgba(21,18,15,.4)';
+}
+
+function copyAppsScript(){
+  const ta=document.getElementById('appsScriptCode');
+  ta.select();ta.setSelectionRange(0,999999);
+  try{document.execCommand('copy');}catch{}
+  if(navigator.clipboard)navigator.clipboard.writeText(ta.value).catch(()=>{});
+  alert('Kode Apps Script disalin! Paste di Extensions → Apps Script.');
+}
+
+// ══ AUTH ═════════════════════════════════════════════════
+function sw(id){['sRole','sPic','sPwd'].forEach(s=>document.getElementById(s).style.display=s===id?'flex':'none');}
+function showPic(){sw('sPic');}
+function showPwd(){sw('sPwd');document.getElementById('pwdIn').value='';document.getElementById('pwdErr').textContent='';}
+function loginAdmin(){if(document.getElementById('pwdIn').value===getPwd())enter('admin','ALL');else{document.getElementById('pwdErr').textContent='Password salah.';document.getElementById('pwdIn').value='';}}
+
+function enter(r,pic){
+  role=r;myPic=pic;
+  ['sRole','sPic','sPwd'].forEach(s=>document.getElementById(s).style.display='none');
+  document.getElementById('app').style.display='block';
+  const b=document.getElementById('badge');
+  b.className='badge '+(r==='admin'?'b-admin':pic==='PAK AGUNG'?'b-pa':pic==='CREATIVE'?'b-cr':pic==='PRODUKSI'?'b-pr':pic==='DESIGNER'?'b-ds':'b-all');
+  b.textContent=r==='admin'?'Admin':pic==='ALL'?'Realisasi':pic;
+  document.getElementById('btnCfg').style.display=r==='admin'?'flex':'none';
+  document.getElementById('statsWrap').style.display=r==='admin'?'block':'none';
+  document.getElementById('fab').style.display=(r==='admin'||pic!=='ALL')?'flex':'none';
+  activeFilter=pic;
+  const td=today();
+  let wi=ALL_WEEKS.findIndex(w=>w.dates.includes(td));
+  activeWeek=wi>=0?wi:ALL_WEEKS.length-1;
+  renderAll();
+  // Sync dari Firebase (fix bug data hilang setelah refresh)
+  doSync();
+  startSync();
+  // Scroll ke hari ini
+  setTimeout(scrollToToday,300);
+}
+
+function logout(){
+  if(syncTimer)clearInterval(syncTimer);syncTimer=null;
+  role='';myPic='';
+  document.getElementById('app').style.display='none';
+  sw('sRole');
+}
+
+// ══ RENDER ═══════════════════════════════════════════════
+function renderNav(){
+  document.getElementById('navWrap').innerHTML='<div class="tabs">'+ALL_WEEKS.map((w,i)=>`<button class="tab${i===activeWeek?' aw':''}" onclick="selW(${i})">${w.lbl}</button>`).join('')+'</div>';
+  setTimeout(()=>{const aw=document.querySelector('.tab.aw');if(aw)aw.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});},80);
+}
+function selW(i){activeWeek=i;renderAll();}
+
+function renderMonth(){
+  const wk=ALL_WEEKS[activeWeek];if(!wk)return;
+  document.getElementById('monthBig').textContent=wk.monthName+' '+wk.year;
+  const hasToday=wk.dates.includes(today());
+  document.getElementById('monthSub').textContent=hasToday?'📍 Minggu aktif — '+wk.lbl:wk.lbl;
+}
+
+function renderFilter(){
+  const all=[['ALL','Realisasi','fa'],['PAK AGUNG','PAK AGUNG','fpa'],['CREATIVE','CREATIVE','fcr'],['PRODUKSI','PRODUKSI','fpr'],['DESIGNER','DESIGNER','fds']];
+  document.getElementById('filterBar').innerHTML=all.map(([v,l,c])=>`<button class="fb${activeFilter===v?' '+c:''}" onclick="setF('${v}')">${l}</button>`).join('');
+}
+function setF(f){activeFilter=f;renderFilter();renderTable();}
+
+function renderStats(){
+  const wk=ALL_WEEKS[activeWeek];let tot=0,done=0;
+  (wk?.dates||[]).forEach(k=>{const t=DATA[k]||[];tot+=t.length;done+=t.filter(x=>x.chk).length;});
+  const pct=tot?Math.round(done/tot*100):0;
+  document.getElementById('statGrid').innerHTML=`<div class="stat-card"><div class="stat-n">${tot}</div><div class="stat-l">Total Task</div></div><div class="stat-card"><div class="stat-n g">${done}</div><div class="stat-l">Selesai</div></div><div class="stat-card"><div class="stat-n">${tot-done}</div><div class="stat-l">Belum</div></div><div class="stat-card"><div class="stat-n g">${pct}%</div><div class="stat-l">Progress</div></div>`;
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progFill').style.width=pct+'%';
+}
+
+function pbadge(pic){
+  const c=pic==='PAK AGUNG'?'pb-pa':pic==='CREATIVE'?'pb-cr':pic==='PRODUKSI'?'pb-pr':'pb-ds';
+  return`<span class="pb ${c}">${pic}</span>`;
+}
+
+function renderTable(){
+  const wk=ALL_WEEKS[activeWeek];const td=today();
+  if(!wk){document.getElementById('content').innerHTML='';return;}
+  let html='';
+  wk.dates.forEach(k=>{
+    const d=new Date(k+'T00:00:00');
+    const lib=LIBUR[k],ro=isRO(k),isToday=k===td;
+    const tasks=sortT((DATA[k]||[]).filter(t=>activeFilter==='ALL'||t.pic===activeFilter));
+    html+=`<div class="day-block" id="day_${k}"><div class="day-lbl">${HRI[d.getDay()]}, ${d.getDate()} ${BLN[d.getMonth()+1]} ${d.getFullYear()}${isToday?' <span class="tag-today">HARI INI</span>':''}${ro?' <span class="tag-ro">Histori</span>':''}${lib?` <span class="tag-libur">LIBUR — ${lib}</span>`:''}</div>`;
+    if(lib&&!tasks.length){html+=`<div class="task-list"><div class="empty"><p>— Hari Libur Nasional —</p></div></div></div>`;return;}
+    if(!tasks.length){
+      const canAdd=!ro&&(role==='admin'||myPic!=='ALL');
+      html+=`<div class="task-list"><div class="empty"><p>Belum ada plan.</p>${canAdd?`<button class="add-inline" onclick="openAdd('${k}')">+ Tambah Plan</button>`:''}</div></div>`;
+    }else{
+      html+=`<div class="task-list">`;
+      tasks.forEach(t=>{
+        const canChk=!ro&&(role==='admin'||t.pic===myPic);
+        const canEdit=!ro&&(role==='admin'||t.pic===myPic);
+        const isAll=myPic==='ALL'&&role!=='admin';
+        const acts=canEdit&&!isAll?`<div style="display:flex;gap:3px"><button class="act-btn" onclick="openEdit('${k}',${t.id},event)">✏️</button><button class="act-btn act-del" onclick="delT('${k}',${t.id},event)">🗑</button></div>`:'';
+        html+=`<div class="task-row${!t.chk?' unchecked':''}">
+          <div class="task-top">
+            <div class="chkbox${t.chk?' on':''}${(!canChk||isAll)?' ro':''}" onclick="${canChk&&!isAll?`toggleChk('${k}',${t.id})`:''}" style="${(!canChk||isAll)?'cursor:default':''}"></div>
+            <div class="task-body">
+              <div class="task-time">⏰ ${t.w}</div>
+              <div class="task-plan">${t.p}</div>
+            </div>
+            <div class="task-right">${pbadge(t.pic)}${acts}</div>
+          </div>`;
+        if(!ro){
+          html+=`<div class="real-wrap"><div class="real-label">📝 Realisasi / Catatan</div>
+            <textarea class="real-input" rows="1" placeholder="Isi jika ada perbedaan atau catatan..." onchange="saveReal('${k}',${t.id},this.value)">${t.real||''}</textarea>
+          </div>`;
+        }else if(t.real){
+          html+=`<div class="real-wrap"><div class="real-label">📝 Realisasi</div><div style="font-size:11px;color:rgba(21,18,15,.5);padding:3px 0">${t.real}</div></div>`;
+        }
+        html+=`</div>`;
+      });
+      if(!ro&&(role==='admin'||myPic!=='ALL')){
+        html+=`<div class="add-more-row"><button class="add-inline" onclick="openAdd('${k}')">+ Tambah Plan</button></div>`;
+      }
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('content').innerHTML=html||'<div style="padding:2rem;text-align:center;color:rgba(21,18,15,.3)">Belum ada data.</div>';
+}
+
+function renderAll(){renderNav();renderMonth();renderFilter();if(role==='admin')renderStats();renderTable();}
+function scrollToToday(){const el=document.getElementById('day_'+today());if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+
+// ══ ACTIONS ══════════════════════════════════════════════
+async function toggleChk(k,id){
+  if(isRO(k))return;
+  const t=(DATA[k]||[]).find(x=>x.id===id);if(!t)return;
+  t.chk=!t.chk;renderAll();await push();
+}
+async function saveReal(k,id,val){
+  const t=(DATA[k]||[]).find(x=>x.id===id);if(!t)return;
+  t.real=val;await push();
+}
+
+function openAdd(date){
+  modalMode='add';editDate=date||today();editId=null;
+  document.getElementById('mTitle').textContent='Tambah Plan';
+  document.getElementById('fDate').value=editDate;
+  document.getElementById('fWaktu').value='';document.getElementById('fPlan').value='';
+  if(role==='tim'){document.getElementById('fPic').value=myPic;document.getElementById('fPicWrap').style.display='none';}
+  else{document.getElementById('fPicWrap').style.display='block';document.getElementById('fPic').value='CREATIVE';}
+  document.getElementById('mTask').style.display='flex';
+  setTimeout(()=>document.getElementById('fWaktu').focus(),200);
+}
+
+function openEdit(k,id,e){
+  e.stopPropagation();if(isRO(k))return;
+  modalMode='edit';editDate=k;editId=id;
+  const t=(DATA[k]||[]).find(x=>x.id===id);if(!t)return;
+  document.getElementById('mTitle').textContent='Edit Plan';
+  document.getElementById('fDate').value=k;document.getElementById('fWaktu').value=t.w;
+  document.getElementById('fPlan').value=t.p;document.getElementById('fPic').value=t.pic;
+  document.getElementById('fPicWrap').style.display=role==='tim'?'none':'block';
+  document.getElementById('mTask').style.display='flex';
+}
+
+async function saveTask(){
+  let w=document.getElementById('fWaktu').value.trim();
+  const p=document.getElementById('fPlan').value.trim();
+  const pic=role==='tim'?myPic:document.getElementById('fPic').value;
+  const date=document.getElementById('fDate').value;
+  if(!w||!p||!date){alert('Waktu dan Plan wajib diisi.');return;}
+  if(isRO(date)){alert('Data histori tidak bisa diubah.');return;}
+  // Auto-format waktu
+  const m=w.match(/^([^-–]+)[-–](.+)$/);
+  w=m?fmtOne(m[1].trim())+' - '+fmtOne(m[2].trim()):fmtOne(w);
+  if(modalMode==='add'){
+    if(!DATA[date])DATA[date]=[];
+    const mx=DATA[date].reduce((a,x)=>Math.max(a,x.id),0);
+    DATA[date].push({id:mx+1,w,p,pic,chk:false,real:''});
+  }else{
+    if(editDate===date){
+      const idx=(DATA[editDate]||[]).findIndex(x=>x.id===editId);
+      if(idx!==-1)DATA[editDate][idx]={...DATA[editDate][idx],w,p,pic};
+    }else{
+      DATA[editDate]=(DATA[editDate]||[]).filter(x=>x.id!==editId);
+      if(!DATA[date])DATA[date]=[];
+      const mx=DATA[date].reduce((a,x)=>Math.max(a,x.id),0);
+      DATA[date].push({id:mx+1,w,p,pic,chk:false,real:''});
+    }
+  }
+  closeM('mTask');renderAll();await push();
+}
+
+async function delT(k,id,e){
+  e.stopPropagation();if(isRO(k))return;
+  if(!confirm('Hapus plan ini?'))return;
+  DATA[k]=(DATA[k]||[]).filter(x=>x.id!==id);renderAll();await push();
+}
+
+// ══ CFG ══════════════════════════════════════════════════
+function openCfg(){
+  document.getElementById('mCfg').style.display='flex';
+  const el=document.getElementById('currentFbUrl');
+  if(el)el.textContent=FB_URL||'Belum dikonfigurasi';
+}
+function openPwdChange(){closeM('mCfg');document.getElementById('np1').value='';document.getElementById('np2').value='';document.getElementById('npErr').textContent='';document.getElementById('mPwd').style.display='flex';}
+function savePwd(){const p1=document.getElementById('np1').value,p2=document.getElementById('np2').value;if(!p1){document.getElementById('npErr').textContent='Tidak boleh kosong.';return;}if(p1!==p2){document.getElementById('npErr').textContent='Tidak cocok.';return;}localStorage.setItem(PWKEY,p1);closeM('mPwd');alert('Password diubah!');}
+async function nukeWeek(){const wk=ALL_WEEKS[activeWeek];if(!wk||!confirm('Hapus semua plan minggu ini?'))return;wk.dates.forEach(k=>{if(!isRO(k))DATA[k]=[];});closeM('mCfg');renderAll();await push();}
+function openExport(){document.getElementById('mExport').style.display='flex';}
+
+// ══ EXPORT ═══════════════════════════════════════════════
+function getRows(){
+  const rows=[];
+  Object.keys(DATA).sort().forEach(k=>{
+    const d=new Date(k+'T00:00:00');
+    const tgl=`${d.getDate()} ${BLN_F[d.getMonth()+1]} ${d.getFullYear()}`;
+    (DATA[k]||[]).forEach(t=>rows.push({id:t.id,iso:k,tanggal:tgl,hari:HRI[d.getDay()],waktu:t.w,plan:t.p,pic:t.pic,selesai:t.chk?'Ya':'Tidak',realisasi:t.real||''}));
+  });
+  return rows;
+}
+function dlBlob(name,content,type){
+  const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportCSV(){
+  const rows=getRows();
+  const hdr=['Tanggal ISO','Tanggal','Hari','Waktu','Plan / Kegiatan','PIC','Selesai','Realisasi / Catatan'];
+  const csv=[hdr,...rows.map(r=>[r.iso,r.tanggal,r.hari,r.waktu,r.plan,r.pic,r.selesai,r.realisasi])].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  dlBlob('ATV_Realisasi.csv','\uFEFF'+csv,'text/csv;charset=utf-8');
+}
+function exportExcel(){
+  if(!window.XLSX){alert('Library belum siap, coba lagi.');return;}
+  const rows=getRows();
+  const wsData=[['Tanggal ISO','Tanggal','Hari','Waktu','Plan / Kegiatan','PIC','Selesai','Realisasi / Catatan'],...rows.map(r=>[r.iso,r.tanggal,r.hari,r.waktu,r.plan,r.pic,r.selesai,r.realisasi])];
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:13},{wch:18},{wch:8},{wch:14},{wch:45},{wch:12},{wch:7},{wch:35}];
+  XLSX.utils.book_append_sheet(wb,'Realisasi ATV',ws);XLSX.writeFile(wb,'ATV_Realisasi.xlsx');
+}
+function exportPDF(){
+  if(!window.jspdf){alert('Library belum siap, coba lagi.');return;}
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'landscape',format:'a4'});
+  doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('ATV Creative Asia — Daily Realisasi',14,12);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');doc.text('Export: '+new Date().toLocaleDateString('id-ID',{year:'numeric',month:'long',day:'numeric'}),14,18);
+  const rows=getRows();
+  doc.autoTable({startY:22,head:[['Tanggal','Hari','Waktu','Plan','PIC','Done','Realisasi']],body:rows.map(r=>[r.tanggal,r.hari,r.waktu,r.plan.substring(0,55),r.pic,r.selesai,r.realisasi.substring(0,40)]),styles:{fontSize:7,cellPadding:2},headStyles:{fillColor:[208,112,72],textColor:255,fontStyle:'bold'},alternateRowStyles:{fillColor:[252,248,244]},columnStyles:{0:{cellWidth:22},1:{cellWidth:12},2:{cellWidth:18},3:{cellWidth:65},4:{cellWidth:18},5:{cellWidth:12},6:{cellWidth:55}}});
+  doc.save('ATV_Realisasi.pdf');
+}
+function exportJSON(){dlBlob('ATV_Realisasi_backup.json',JSON.stringify(DATA,null,2),'application/json');}
+
+// ══ IMPORT ═══════════════════════════════════════════════
+function handleImport(input){
+  const file=input.files[0];if(!file)return;
+  const st=document.getElementById('impStatus');st.textContent='Memproses...';st.style.color='rgba(21,18,15,.4)';
+  const ext=file.name.split('.').pop().toLowerCase();
+  const done=(n)=>{st.textContent=`✅ ${n} baris diimport!`;st.style.color='var(--grn)';lSave();renderAll();push();};
+  const fail=(msg)=>{st.textContent='❌ '+msg;st.style.color='#c0392b';};
+  if(ext==='json'){
+    const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);DATA=mergeCloud(d);done(Object.values(d).reduce((a,v)=>a+(v.length||0),0));}catch{fail('Format JSON tidak valid.');}};r.readAsText(file);
+  }else if(ext==='csv'){
+    const r=new FileReader();r.onload=e=>{
+      try{
+        const lines=e.target.result.replace(/\r/g,'').split('\n').filter(l=>l.trim());let n=0;
+        lines.slice(1).forEach(line=>{
+          const cols=line.split(',').map(c=>c.replace(/^"|"$/g,'').replace(/""/g,'"').trim());
+          const iso=cols[0];if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return;
+          if(!DATA[iso])DATA[iso]=[];
+          const mx=DATA[iso].reduce((a,x)=>Math.max(a,x.id),0);
+          DATA[iso].push({id:mx+1,w:cols[3]||'',p:cols[4]||'',pic:cols[5]||'CREATIVE',chk:cols[6]==='Ya',real:cols[7]||''});n++;
+        });
+        done(n);
+      }catch{fail('Gagal baca CSV.');}
+    };r.readAsText(file,'UTF-8');
+  }else if(ext==='xlsx'||ext==='xls'){
+    if(!window.XLSX){fail('Library Excel belum siap.');return;}
+    const r=new FileReader();r.onload=e=>{
+      try{
+        const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});let n=0;
+        rows.slice(1).forEach(cols=>{
+          const iso=String(cols[0]||'').trim();if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return;
+          if(!DATA[iso])DATA[iso]=[];
+          const mx=DATA[iso].reduce((a,x)=>Math.max(a,x.id),0);
+          DATA[iso].push({id:mx+1,w:String(cols[3]||''),p:String(cols[4]||''),pic:String(cols[5]||'CREATIVE'),chk:String(cols[6])==='Ya',real:String(cols[7]||'')});n++;
+        });
+        done(n);
+      }catch{fail('Gagal baca Excel.');}
+    };r.readAsArrayBuffer(file);
+  }else{fail('Format tidak didukung.');}
+  input.value='';
+}
+
+// ══ DATA PRODUKTIVITAS ═══════════════════════════════════
+let prodSkala='planning',prodChartType='bar',prodChartInst=null,prodStart='',prodEnd='';
+
+const WORK_KW=['meeting','client','dadakan','delegasi','urgent','shooting','pak agung','pak chris','rapat','presentasi','follow up','brief mendadak'];
+const NO_KW=['macet','dijalan','di jalan','masih jalan','dandan','telat','bangun kesiangan'];
+
+function isWorkReal(txt){
+  if(!txt)return false;const l=txt.toLowerCase();
+  for(const k of NO_KW)if(l.includes(k))return false;
+  for(const k of WORK_KW)if(l.includes(k))return true;
+  return false;
+}
+function cntDone(t){return t.chk||isWorkReal(t.real);}
+
+const PC_PROD={'CREATIVE':'#D07048','PRODUKSI':'#4a2d6b','DESIGNER':'#1a4a7a'};
+const PROD_PICS=['CREATIVE','PRODUKSI','DESIGNER'];
+
+function getProdDates(){
+  const ds=[];const cur=new Date(prodStart+'T00:00:00');const end=new Date(prodEnd+'T00:00:00');
+  while(cur<=end){ds.push(isoDate(cur));cur.setDate(cur.getDate()+1);}return ds;
+}
+function getDayCount(pic,date){
+  const tasks=(DATA[date]||[]).filter(t=>t.pic===pic);
+  return prodSkala==='realisasi'?tasks.filter(t=>cntDone(t)).length:tasks.length;
+}
+function getTotalCount(pic,dates){return dates.reduce((s,d)=>s+getDayCount(pic,d),0);}
+
+function openProduktivitas(){
+  const now=new Date();const s=new Date(now);s.setDate(s.getDate()-6);
+  prodEnd=isoDate(now);prodStart=isoDate(s);
+  document.getElementById('prodStartDate').value=prodStart;
+  document.getElementById('prodEndDate').value=prodEnd;
+  prodSkala='planning';prodChartType='bar';
+  document.getElementById('mProd').style.display='flex';
+  setSkala('planning');
+}
+
+function setSkala(s){
+  prodSkala=s;
+  const bp=document.getElementById('btnSkalaP'),br=document.getElementById('btnSkalaR');
+  if(s==='planning'){
+    bp.style.cssText='flex:1;padding:9px;border-radius:9px;border:2px solid var(--org);background:var(--org);color:#fff;font-size:12px;font-weight:700;cursor:pointer';
+    br.style.cssText='flex:1;padding:9px;border-radius:9px;border:2px solid rgba(21,18,15,.12);background:#f4f3ef;color:rgba(21,18,15,.5);font-size:12px;font-weight:700;cursor:pointer';
+  }else{
+    br.style.cssText='flex:1;padding:9px;border-radius:9px;border:2px solid var(--grn);background:var(--grn);color:#fff;font-size:12px;font-weight:700;cursor:pointer';
+    bp.style.cssText='flex:1;padding:9px;border-radius:9px;border:2px solid rgba(21,18,15,.12);background:#f4f3ef;color:rgba(21,18,15,.5);font-size:12px;font-weight:700;cursor:pointer';
+  }
+  renderProdChart();
+}
+
+function setChartType(t){
+  prodChartType=t;
+  ['pie','curve','bar'].forEach(x=>{
+    const b=document.getElementById('ct-'+x);if(!b)return;
+    const on=x===t;
+    b.style.background=on?'var(--blk)':'#f4f3ef';
+    b.style.color=on?'#fff':'rgba(21,18,15,.5)';
+    b.style.borderColor=on?'var(--blk)':'rgba(21,18,15,.12)';
+  });
+  renderProdChart();
+}
+
+function applyDateRange(){
+  const s=document.getElementById('prodStartDate').value;
+  const e=document.getElementById('prodEndDate').value;
+  if(!s||!e||s>e){alert('Range tanggal tidak valid.');return;}
+  prodStart=s;prodEnd=e;renderProdChart();
+}
+
+function renderProdChart(){
+  if(!window.Chart){return;}
+  const dates=getProdDates();
+  if(prodChartInst){prodChartInst.destroy();prodChartInst=null;}
+  const canvas=document.getElementById('prodCanvas');
+  const ctx=canvas.getContext('2d');
+  const totals=PROD_PICS.map(p=>getTotalCount(p,dates));
+  const lbl=prodSkala==='realisasi'?'Task Dikerjakan':'Task Direncanakan';
+
+  if(prodChartType==='pie'){
+    prodChartInst=new Chart(ctx,{
+      type:'pie',
+      data:{labels:PROD_PICS,datasets:[{data:totals,backgroundColor:PROD_PICS.map(p=>PC_PROD[p]),borderWidth:3,borderColor:'#fff'}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{size:12},padding:14}},
+          tooltip:{callbacks:{label:c=>{const t=totals.reduce((a,b)=>a+b,0);return` ${c.label}: ${c.raw} task (${t?Math.round(c.raw/t*100):0}%)`;}}}}}
+    });
+  }else if(prodChartType==='curve'){
+    const labels=dates.map(d=>{const dt=new Date(d+'T00:00:00');return`${dt.getDate()}/${dt.getMonth()+1}`;});
+    const datasets=PROD_PICS.map(p=>{
+      let acc=0;
+      return{label:p,data:dates.map(d=>{acc+=getDayCount(p,d);return acc;}),
+        borderColor:PC_PROD[p],backgroundColor:PC_PROD[p]+'25',fill:true,tension:0.4,
+        pointBackgroundColor:PC_PROD[p],pointRadius:4,pointHoverRadius:6,borderWidth:2.5};
+    });
+    prodChartInst=new Chart(ctx,{
+      type:'line',data:{labels,datasets},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}},
+        scales:{y:{beginAtZero:true,title:{display:true,text:lbl,font:{size:10}}},
+          x:{title:{display:true,text:'Tanggal',font:{size:10}}}}}
+    });
+  }else{
+    prodChartInst=new Chart(ctx,{
+      type:'bar',
+      data:{labels:PROD_PICS,datasets:[{label:lbl,data:totals,
+        backgroundColor:PROD_PICS.map(p=>PC_PROD[p]),borderRadius:10,borderWidth:0,
+        hoverBackgroundColor:PROD_PICS.map(p=>PC_PROD[p]+'cc')}]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw} task`}}},
+        scales:{y:{beginAtZero:true,title:{display:true,text:'Jumlah Task',font:{size:10}}}}}
+    });
+  }
+
+  // Summary
+  const tot=totals.reduce((a,b)=>a+b,0);
+  const winner=PROD_PICS[totals.indexOf(Math.max(...totals))];
+  document.getElementById('prodSummary').innerHTML=
+    `<div style="font-size:9px;font-weight:700;color:rgba(21,18,15,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Ringkasan · ${dates.length} hari data</div>`+
+    PROD_PICS.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${PC_PROD[p]};flex-shrink:0"></div>
+      <span style="font-weight:700;color:${PC_PROD[p]};font-size:12px;min-width:70px">${p}</span>
+      <div style="flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${tot?Math.round(totals[i]/tot*100):0}%;background:${PC_PROD[p]};border-radius:3px;transition:width .4s"></div>
+      </div>
+      <span style="font-size:12px;font-weight:600;min-width:45px;text-align:right">${totals[i]} task</span>
+      <span style="color:rgba(21,18,15,.35);font-size:11px;min-width:32px">${tot?Math.round(totals[i]/tot*100):0}%</span>
+    </div>`).join('')+
+    `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(21,18,15,.08);font-size:10px;color:rgba(21,18,15,.35)">
+      ${prodSkala==='realisasi'?'✅ Tercentang + realisasi berkaitan kantor':'📋 Semua task yang direncanakan'} · 
+      🏆 Terbanyak: <strong style="color:${PC_PROD[winner]}">${winner}</strong>
+    </div>`;
+}
+
+// ══ MODAL ════════════════════════════════════════════════
+function closeM(id){document.getElementById(id).style.display='none';}
+function bgClose(e,id){if(e.target===document.getElementById(id))closeM(id);}
+
+// ══ INIT ═════════════════════════════════════════════════
+lLoad();
+// Langsung ke role selection — tidak ada setup screen
+document.getElementById('sRole').style.display='flex';
+</script>
+</body>
+</html>
